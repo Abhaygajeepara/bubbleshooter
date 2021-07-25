@@ -56,24 +56,24 @@ class _BotomSectionState extends State<BotomSection> {
           child: CustomPaint(
             painter: customPaintrt(bx,by,dx,dy),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
               children: [
                 //firedBubbleQueue(bubbleData),
+                Text( "y="+bubbleData.targetY.toString()+"   "+"x="+bubbleData.targetY.toString(),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                  ),
+                ),
                 bubbleData.firedBubbleColor.length <= 0
                     ? Container()
-                    : GestureDetector(
-
-                    onTap: () {
-                      bubbleData.setTarget(1, 2);
-                      bubbleData.firedFunction();
-                      bubbleData.removeFiredColorFromQueue(0);
-
-                      setState(() {});
-                    },
-                    child: FiredBubble(bubbleColor:bubbleData.firedBubbleColor[0])
-                ),
-                //firedBubbleQueue(bubbleData)
+                    : FiredBubble(bubbleColor:bubbleData.firedBubbleColor[0]),
+                ElevatedButton(onPressed: (){
+                  bubbleData.firedFunction();
+                  bubbleData.removeFiredColorFromQueue(0);
+                }, child: Text('Fire'))
               ],
             ),
           )),

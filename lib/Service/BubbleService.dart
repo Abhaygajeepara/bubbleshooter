@@ -11,7 +11,7 @@ class BubbleService extends ChangeNotifier {
   List<List<Bubble>> allBubble = [];
   List<Color> firedBubbleColor = [];
   int moves = 10;
-  int  bubbleColorInLevel =3;
+  int  bubbleColorInLevel =2;
  int bubbleColumns =11;
  int numberSurroundingNodes =6;
 
@@ -23,6 +23,7 @@ int targetX=-1;
 setTarget (int y,int x){
   this.targetY=y;
   this.targetX=x;
+  notifyListeners();
 }
 
   int fixColumn =10; // remove after testing
@@ -244,120 +245,7 @@ setTarget (int y,int x){
 
       }
     }while(removeNode.length !=0);
-  // fall functionality
 
-      // fall node which does not have any surrounding node with same color
-    // for(int m=0;m<actualRemoveNode.length;m++){
-    //
-    //
-    //   int checkY=actualRemoveNode[m].y;
-    //   int checkX=actualRemoveNode[m].x;
-    //
-    //     if(checkY!=-1&&checkX!=-1){
-    //       for(int n=0;n<numberSurroundingNodes;n++)
-    //       {
-    //         if(n==4||n==5){
-    //           int inspectY=allBubble[checkY][checkX].surroundingCoordinate[n].y;
-    //           int inspectX=allBubble[checkY][checkX].surroundingCoordinate[n].x;
-    //          if(inspectY!=-1&&inspectX!=-1){
-    //
-    //            if(allBubble[inspectY][inspectX].bubbleColor!=BubbleColor0){
-    //             // BubblesCoordinate checkCorrdinates =BubblesCoordinate(y: allBubble[checkY][checkX].surroundingCoordinate[n].y, x: allBubble[checkY][checkX].surroundingCoordinate[n].x);
-    //              BubblesCoordinate checkCoordinate =assignCoordinates(allBubble[checkY][checkX].surroundingCoordinate[n].y, allBubble[checkY][checkX].surroundingCoordinate[n].x);
-    //
-    //            // List<int> corrdinate =[allBubble[checkY][checkX].surroundingCoordinate[n].y,allBubble[checkY][checkX].surroundingCoordinate[n].x];
-    //
-    //              if(inspectNodeList.contains(checkCoordinate)){
-    //                //print('true');
-    //                //print("${checkCoordinate.y},${checkCoordinate.x}");
-    //              }
-    //              else{
-    //                //print('false');
-    //                //print("${checkCoordinate.y}${checkCoordinate.x}");
-    //
-    //              }
-    //              double dy=checkCoordinate.y.toDouble();
-    //              double dx=checkCoordinate.x.toDouble();
-    //              inspectNodeList.add(Offset(dy,dx));
-    //
-    //            }
-    //          }
-    //         }
-    //         int inspectY=allBubble[checkY][checkX].surroundingCoordinate[n].y;
-    //         int inspectX =allBubble[checkY][checkX].surroundingCoordinate[n].x;
-    //         List<bool> anyTransparent=[];// to  check there is any surrounding node is transparent
-    //        if(inspectY!=-1&& inspectX!=-1){
-    //          for(int o=0;o<numberSurroundingNodes;o++){
-    //            int fallY = allBubble[inspectY][inspectX].surroundingCoordinate[o].y;
-    //            int fallX = allBubble[inspectY][inspectX].surroundingCoordinate[o].x;
-    //            if(fallY!=-1&& fallX!=-1){
-    //              if(allBubble[fallY][fallX].bubbleColor==BubbleColor0){
-    //                anyTransparent.add(true);// yes node color is  transparent
-    //              }else{
-    //                anyTransparent.add(false);//  node color is not transparent
-    //              }
-    //            }
-    //          }
-    //          if(anyTransparent.contains(false)){
-    //
-    //          }else{
-    //            if(allBubble[inspectY][inspectX].bubbleColor!=BubbleColor0){
-    //              BubblesCoordinate fall = assignCoordinates(inspectY , inspectX);
-    //              fallNode.add(fall);
-    //
-    //            }
-    //          }
-    //
-    //        }
-    //
-    //       }
-    //   }
-    //
-    //  // check if any row is empty
-    //   List<BubblesCoordinate> rowFallList = calculateRemoveRow(fallNode);
-    //   fallNode.addAll(rowFallList);
-    //
-    //   // remove lonely nodes
-    //   fallMethod(fallNode);
-    //
-    // }
-    //
-
-
-// remove
-
-
-    // do{
-    //   for(int c=0;c<inspectNodeList.length;c++){
-    //
-    //     int inspectY=inspectNodeList.elementAt(c).dy.toInt();
-    //     int inspectX=inspectNodeList.elementAt(c).dx.toInt();
-    //
-    //     for(int d=0;d<4;d++){
-    //
-    //       int secondInspectY=allBubble[inspectY][inspectX].surroundingCoordinate[d].y;
-    //       int secondInspectX=allBubble[inspectY][inspectX].surroundingCoordinate[d].x;
-    //
-    //       if(secondInspectY!=-1&&secondInspectX!=-1){
-    //         if(allBubble[secondInspectY][secondInspectX].bubbleColor!=BubbleColor0){
-    //         print("${secondInspectY},${secondInspectX}");
-    //           BubblesCoordinate newCoordinate=assignCoordinates(secondInspectY,secondInspectX);
-    //           if(inspectNodeList.contains(newCoordinate)==false){
-    //             double dy=secondInspectY.toDouble();
-    //             double dx=secondInspectX.toDouble();
-    //             inspectNodeList.add(Offset(dy,dx));
-    //           // inspectNodeList.add(newCoordinate);
-    //           }
-    //
-    //         }
-    //       }
-    //     }
-    //     inspectNodeList.remove(inspectNodeList.elementAt(c));
-    //   }
-    //
-    // }
-    // while(inspectNodeList.length!=0);
-   // //print(inspectNodeList.length);
     calculateFalling();
     notifyListeners();
   }
@@ -482,33 +370,96 @@ print('oldCheck'+checkedNode.toString());
 
 
 
-for(int i =0;i<allBubble.length;i++){
-  for(int j=0;j<allBubble[i].length;j++){
-    if(allBubble[i][j].bubbleColor!=BubbleColor0){
-      int offsetY =allBubble[i][j].bubbleCoordinate.y;
-      int offsetX =allBubble[i][j].bubbleCoordinate.x;
-      bool isFound =false;
-      for(int n=0;n<allBubble[i][j].surroundingCoordinate.length;n++){
-        int checkY= allBubble[i][j].surroundingCoordinate[n].y;
-        int checkX= allBubble[i][j].surroundingCoordinate[n].x;
-        Offset guessOffset = Offset(checkX.toDouble(),checkY.toDouble());
-        if(checkedNode.contains(guessOffset)){
-          checkedNode.add(guessOffset);
-          isFound =true;
-          break;
-        }
-      }
+// for(int i =0;i<allBubble.length;i++){
+//   for(int j=0;j<allBubble[i].length;j++){
+//     if(allBubble[i][j].bubbleColor!=BubbleColor0){
+//       int offsetY =allBubble[i][j].bubbleCoordinate.y;
+//       int offsetX =allBubble[i][j].bubbleCoordinate.x;
+//       Offset guessOffset = Offset(offsetX.toDouble(),offsetY.toDouble());
+//       if(checkedNode.contains(guessOffset)==false){
+//         fallingNodes.add(guessOffset);
+//       }
+//
+//       // bool isFound =false;
+//       // for(int n=0;n<allBubble[i][j].surroundingCoordinate.length;n++){
+//       //   int checkY= allBubble[i][j].surroundingCoordinate[n].y;
+//       //   int checkX= allBubble[i][j].surroundingCoordinate[n].x;
+//       //   Offset guessOffset = Offset(checkX.toDouble(),checkY.toDouble());
+//       //   if(checkedNode.contains(guessOffset)){
+//       //     checkedNode.add(guessOffset);
+//       //     isFound =true;
+//       //     break;
+//       //   }
+//       // }
+//       //
+//       // if(isFound==false){
+//       //   Offset check =Offset(offsetX.toDouble(), offsetY.toDouble());
+//       //   if(checkedNode.contains(check)==false){
+//       //     fallingNodes.add(check);
+//       //     // allBubble[i][j].bubbleColor =Colors.white;
+//       //   }
+//       // }
+//
+//     }
+//   }
+// }
+bool checkingContinue = true;
+int checkNodeLength=checkedNode.length;
+ print("abhay" +checkedNode.length.toString());
+do{
+  bool valueChanged = false;
 
-      if(isFound==false){
-        Offset check =Offset(offsetX.toDouble(), offsetY.toDouble());
-        if(checkedNode.contains(check)==false){
-          allBubble[i][j].bubbleColor =Colors.white;
+  for(int i =0;i<allBubble.length;i++){
+    for(int j=0;j<allBubble[i].length;j++){
+      if(allBubble[i][j].bubbleColor!=BubbleColor0){
+        int offsetY =allBubble[i][j].bubbleCoordinate.y;
+        int offsetX =allBubble[i][j].bubbleCoordinate.x;
+        Offset guessOffset = Offset(offsetX.toDouble(),offsetY.toDouble());
+
+        if(checkedNode.contains(guessOffset)==false){
+
+          for(int q=0;q<allBubble[offsetY][offsetX].surroundingCoordinate.length;q++){
+           int surroundingY= allBubble[offsetY][offsetX].surroundingCoordinate[q].y;
+           int surroundingX= allBubble[offsetY][offsetX].surroundingCoordinate[q].x;
+           Offset surrondingOffset =Offset(surroundingX.toDouble(),surroundingY.toDouble());
+           if(checkedNode.contains(surrondingOffset)){
+             valueChanged =true;
+             checkedNode.add(guessOffset);
+             print( "chhedd="+ surrondingOffset.toString());
+
+           }
+          }
+        }
+
+      }
+    }
+
+  }
+
+  if(valueChanged==true){
+    checkingContinue= true;
+  }else{
+    checkingContinue=false;
+  }
+
+  print('chaned'+valueChanged.toString());
+}while(checkingContinue!=false);
+
+    for(int i =0;i<allBubble.length;i++){
+      for(int j=0;j<allBubble[i].length;j++){
+        if(allBubble[i][j].bubbleColor!=BubbleColor0){
+          int offsetY =allBubble[i][j].bubbleCoordinate.y;
+          int offsetX =allBubble[i][j].bubbleCoordinate.x;
+          Offset guessOffset = Offset(offsetX.toDouble(),offsetY.toDouble());
+
+          if(checkedNode.contains(guessOffset)==false){
+            allBubble[i][j].bubbleColor=Colors.white;
+          }
+
         }
       }
 
     }
-  }
-}
 
   }
 
@@ -577,3 +528,121 @@ for(int i =0;i<allBubble.length;i++){
   }
 
 }
+
+
+// remove later
+
+// fall functionality
+
+// fall node which does not have any surrounding node with same color
+// for(int m=0;m<actualRemoveNode.length;m++){
+//
+//
+//   int checkY=actualRemoveNode[m].y;
+//   int checkX=actualRemoveNode[m].x;
+//
+//     if(checkY!=-1&&checkX!=-1){
+//       for(int n=0;n<numberSurroundingNodes;n++)
+//       {
+//         if(n==4||n==5){
+//           int inspectY=allBubble[checkY][checkX].surroundingCoordinate[n].y;
+//           int inspectX=allBubble[checkY][checkX].surroundingCoordinate[n].x;
+//          if(inspectY!=-1&&inspectX!=-1){
+//
+//            if(allBubble[inspectY][inspectX].bubbleColor!=BubbleColor0){
+//             // BubblesCoordinate checkCorrdinates =BubblesCoordinate(y: allBubble[checkY][checkX].surroundingCoordinate[n].y, x: allBubble[checkY][checkX].surroundingCoordinate[n].x);
+//              BubblesCoordinate checkCoordinate =assignCoordinates(allBubble[checkY][checkX].surroundingCoordinate[n].y, allBubble[checkY][checkX].surroundingCoordinate[n].x);
+//
+//            // List<int> corrdinate =[allBubble[checkY][checkX].surroundingCoordinate[n].y,allBubble[checkY][checkX].surroundingCoordinate[n].x];
+//
+//              if(inspectNodeList.contains(checkCoordinate)){
+//                //print('true');
+//                //print("${checkCoordinate.y},${checkCoordinate.x}");
+//              }
+//              else{
+//                //print('false');
+//                //print("${checkCoordinate.y}${checkCoordinate.x}");
+//
+//              }
+//              double dy=checkCoordinate.y.toDouble();
+//              double dx=checkCoordinate.x.toDouble();
+//              inspectNodeList.add(Offset(dy,dx));
+//
+//            }
+//          }
+//         }
+//         int inspectY=allBubble[checkY][checkX].surroundingCoordinate[n].y;
+//         int inspectX =allBubble[checkY][checkX].surroundingCoordinate[n].x;
+//         List<bool> anyTransparent=[];// to  check there is any surrounding node is transparent
+//        if(inspectY!=-1&& inspectX!=-1){
+//          for(int o=0;o<numberSurroundingNodes;o++){
+//            int fallY = allBubble[inspectY][inspectX].surroundingCoordinate[o].y;
+//            int fallX = allBubble[inspectY][inspectX].surroundingCoordinate[o].x;
+//            if(fallY!=-1&& fallX!=-1){
+//              if(allBubble[fallY][fallX].bubbleColor==BubbleColor0){
+//                anyTransparent.add(true);// yes node color is  transparent
+//              }else{
+//                anyTransparent.add(false);//  node color is not transparent
+//              }
+//            }
+//          }
+//          if(anyTransparent.contains(false)){
+//
+//          }else{
+//            if(allBubble[inspectY][inspectX].bubbleColor!=BubbleColor0){
+//              BubblesCoordinate fall = assignCoordinates(inspectY , inspectX);
+//              fallNode.add(fall);
+//
+//            }
+//          }
+//
+//        }
+//
+//       }
+//   }
+//
+//  // check if any row is empty
+//   List<BubblesCoordinate> rowFallList = calculateRemoveRow(fallNode);
+//   fallNode.addAll(rowFallList);
+//
+//   // remove lonely nodes
+//   fallMethod(fallNode);
+//
+// }
+//
+
+
+// remove
+
+
+// do{
+//   for(int c=0;c<inspectNodeList.length;c++){
+//
+//     int inspectY=inspectNodeList.elementAt(c).dy.toInt();
+//     int inspectX=inspectNodeList.elementAt(c).dx.toInt();
+//
+//     for(int d=0;d<4;d++){
+//
+//       int secondInspectY=allBubble[inspectY][inspectX].surroundingCoordinate[d].y;
+//       int secondInspectX=allBubble[inspectY][inspectX].surroundingCoordinate[d].x;
+//
+//       if(secondInspectY!=-1&&secondInspectX!=-1){
+//         if(allBubble[secondInspectY][secondInspectX].bubbleColor!=BubbleColor0){
+//         print("${secondInspectY},${secondInspectX}");
+//           BubblesCoordinate newCoordinate=assignCoordinates(secondInspectY,secondInspectX);
+//           if(inspectNodeList.contains(newCoordinate)==false){
+//             double dy=secondInspectY.toDouble();
+//             double dx=secondInspectX.toDouble();
+//             inspectNodeList.add(Offset(dy,dx));
+//           // inspectNodeList.add(newCoordinate);
+//           }
+//
+//         }
+//       }
+//     }
+//     inspectNodeList.remove(inspectNodeList.elementAt(c));
+//   }
+//
+// }
+// while(inspectNodeList.length!=0);
+// //print(inspectNodeList.length);

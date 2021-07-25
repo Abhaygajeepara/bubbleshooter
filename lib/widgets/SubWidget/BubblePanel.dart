@@ -33,7 +33,7 @@ class _BubblePanelState extends State<BubblePanel> {
                   itemBuilder: (context, subIndex) {
 
                     return SingleBubble(
-                        buubleColor: bubbleData.allBubble[index][subIndex].bubbleColor);
+                        buubleColor: bubbleData.allBubble[index][subIndex].bubbleColor,y: index,x: subIndex,);
                   }),
             ),
           );
