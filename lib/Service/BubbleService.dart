@@ -82,6 +82,7 @@ setTarget (int y,int x){
     //   }
     //   //print('new');
     // }
+    notifyListeners();
   }
 
   Bubble singleBubble(int i, int j,Color newColor) {
@@ -182,7 +183,7 @@ setTarget (int y,int x){
       firedBubbleColor.add(bubbleColors[rand]);
 
     }
-
+    notifyListeners();
   }
 
   removeFiredColorFromQueue(int index){
@@ -196,7 +197,7 @@ setTarget (int y,int x){
   int y = this.targetY;
   int x = this.targetX;
   Color newBubble = firedBubbleColor[0];
-    //Bubble newbubble = Bubble(bubbleColor: newBubble,bubbleCoordinate: allBubble[y][x].bubbleCoordinate,surroundingCoordinate:allBubble[y][x].surroundingCoordinate );
+  if( y !=-1&& x!=-1){
     assignNewValueToBubbleClass(y, x, newBubble); // set new Color to define node
 
     List<BubblesCoordinate> removeNode =[];
@@ -220,7 +221,7 @@ setTarget (int y,int x){
 
     }
 
-  // compare define node Color with Surrounding Nodes until nodes has different color
+    // compare define node Color with Surrounding Nodes until nodes has different color
     do{
       for(int j=0;j<removeNode.length;j++){
         int removeY=removeNode[j].y;
@@ -233,13 +234,13 @@ setTarget (int y,int x){
             if(allBubble[removeSurroundY][removeSurroundX].bubbleColor==check.bubbleColor){
               BubblesCoordinate remove = assignCoordinates( removeSurroundY, removeSurroundX);
               removeNode.add(remove);
-             if( actualRemoveNode.contains(remove)==false){
-               actualRemoveNode.add(remove);
-             }
+              if( actualRemoveNode.contains(remove)==false){
+                actualRemoveNode.add(remove);
+              }
             }
           }
         }
-       assignNewValueToBubbleClass(removeY, removeX, Colors.transparent);
+        assignNewValueToBubbleClass(removeY, removeX, Colors.transparent);
 
         removeNode.removeAt(j);
 
@@ -249,32 +250,14 @@ setTarget (int y,int x){
     calculateFalling();
     notifyListeners();
   }
+    //Bubble newbubble = Bubble(bubbleColor: newBubble,bubbleCoordinate: allBubble[y][x].bubbleCoordinate,surroundingCoordinate:allBubble[y][x].surroundingCoordinate );
+
+  }
 
   calculateFalling(){
  final Set<Offset> checkedNode =Set();
   final Set<Offset> mustCheckedList =Set();
-  late Offset firstAttchedNodes ;
- //cehck first row
- // for(int j =0;j<allBubble[0].length;j++){
- //   if(allBubble[0][j].bubbleColor!=BubbleColor0){
- //     int checkY =allBubble[0][j].bubbleCoordinate.y;
- //     int checkX =allBubble[0][j].bubbleCoordinate.x;
- //     firstAttchedNodes =Offset(checkX.toDouble(),checkY.toDouble());
- //
- //     break;
- //   }
- // }
- //
- // int firstX=firstAttchedNodes.dx.toInt();
- // int firstY=firstAttchedNodes.dy.toInt();
- // for(int k=0;k<allBubble[firstY][firstX].surroundingCoordinate.length;k++){
- //   int surroundingY=allBubble[firstY][firstX].surroundingCoordinate[k].y;
- //   int surroundingX=allBubble[firstY][firstX].surroundingCoordinate[k].x;
- //   if(surroundingY!=-1&&surroundingX!=-1){
- //     Offset addNode = Offset(surroundingX.toDouble(),surroundingY.toDouble(),);
- //     mustCheckedList.add(addNode);
- //   }
- // }
+
 
  for(int j =0;j<allBubble[0].length;j++){
 
@@ -296,7 +279,7 @@ setTarget (int y,int x){
 
  }
 
-print('oldCheck'+checkedNode.toString());
+
 
  do{
    int mustLength = mustCheckedList.length;
@@ -461,6 +444,8 @@ do{
 
     }
 
+    setTarget(-1, -1);
+    //function over
   }
 
   List<BubblesCoordinate> calculateRemoveRow(List<BubblesCoordinate> fallNodeList){

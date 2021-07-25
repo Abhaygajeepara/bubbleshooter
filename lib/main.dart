@@ -8,13 +8,24 @@ void main() {
   runApp(ProviderScope(child: MyApp()));
 }
 final buubleProvider = ChangeNotifierProvider((ref)=>BubbleService());
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read(buubleProvider).setDefaultData();
+    context.read(buubleProvider).assignColorToFiredBubbleColor();
+  }
+  @override
   Widget build(BuildContext context) {
-context.read(buubleProvider).setDefaultData();
-context.read(buubleProvider).assignColorToFiredBubbleColor();
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

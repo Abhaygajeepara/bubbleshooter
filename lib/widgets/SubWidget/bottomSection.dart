@@ -71,8 +71,32 @@ class _BotomSectionState extends State<BotomSection> {
                     ? Container()
                     : FiredBubble(bubbleColor:bubbleData.firedBubbleColor[0]),
                 ElevatedButton(onPressed: (){
-                  bubbleData.firedFunction();
-                  bubbleData.removeFiredColorFromQueue(0);
+                  if(bubbleData.firedBubbleColor.length!=0){
+                    bubbleData.firedFunction();
+                    bubbleData.removeFiredColorFromQueue(0);
+                  }else{
+                    showDialog(context: context,
+                   builder: (context){
+                      return AlertDialog(
+
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('kal aa na'),
+
+                            ElevatedButton(onPressed: (){
+                              bubbleData.setDefaultData();
+                              bubbleData.assignColorToFiredBubbleColor();
+                              Navigator.pop(context);
+
+                            }, child: Text('restart'))
+                          ],
+                        ),
+                      );
+                   }
+
+                    );
+                  }
                 }, child: Text('Fire'))
               ],
             ),
