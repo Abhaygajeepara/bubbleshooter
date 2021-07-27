@@ -10,8 +10,8 @@ class BubbleService extends ChangeNotifier {
   List bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3, BubbleColor0];
 
   // for gameScreen
-  int displayBubbleColumn=10;
-  int currentTopColumn=10;
+  int displayBubbleColumn=20;
+  //int currentTopColumn=10;
 
   // calculation
   List<List<Bubble>> allBubble = [];
@@ -275,7 +275,7 @@ class BubbleService extends ChangeNotifier {
       // find surrounding node of define node
       int checkY=check.surroundingCoordinate[i].y;
       int checkX=check.surroundingCoordinate[i].x;
-      if(checkY!=-1&&checkX!=-1){
+      if(checkY!=-1&&checkX!=-1&&checkY>=fakeTop){
         Bubble surroundCheck = allBubble[checkY][checkX];
         if(check.bubbleColor==surroundCheck.bubbleColor){
           BubblesCoordinate remove = BubblesCoordinate(y: checkY,x: checkX);
@@ -294,7 +294,7 @@ class BubbleService extends ChangeNotifier {
         for(int k=0;k<numberSurroundingNodes;k++){
           int removeSurroundY= allBubble[removeY][removeX].surroundingCoordinate[k].y;
           int removeSurroundX= allBubble[removeY][removeX].surroundingCoordinate[k].x;
-          if(removeSurroundY!=-1 && removeSurroundX!= -1){
+          if(removeSurroundY!=-1 && removeSurroundX!= -1&&removeSurroundY>=fakeTop){
 
             if(allBubble[removeSurroundY][removeSurroundX].bubbleColor==check.bubbleColor){
               BubblesCoordinate remove = assignCoordinates( removeSurroundY, removeSurroundX);
@@ -324,17 +324,17 @@ class BubbleService extends ChangeNotifier {
   final Set<Offset> mustCheckedList =Set();
 
 
- for(int j =0;j<allBubble[0].length;j++){
+ for(int j =0;j<allBubble[fakeTop].length;j++){
 
-   if(allBubble[0][j].bubbleColor!=BubbleColor0){
-     int rowY = allBubble[0][j].bubbleCoordinate.y;
-     int rowX = allBubble[0][j].bubbleCoordinate.x;
+   if(allBubble[fakeTop][j].bubbleColor!=BubbleColor0){
+     int rowY = allBubble[fakeTop][j].bubbleCoordinate.y;
+     int rowX = allBubble[fakeTop][j].bubbleCoordinate.x;
      Offset addCheckOffset=Offset(rowX.toDouble(), rowY.toDouble());
      checkedNode.add(addCheckOffset);
-     for(int k=0;k<allBubble[0][j].surroundingCoordinate.length;k++){
-       int surroundingY=allBubble[0][j].surroundingCoordinate[k].y;
-       int surroundingX=allBubble[0][j].surroundingCoordinate[k].x;
-       if(surroundingY!=-1&&surroundingX!=-1){
+     for(int k=0;k<allBubble[fakeTop][j].surroundingCoordinate.length;k++){
+       int surroundingY=allBubble[fakeTop][j].surroundingCoordinate[k].y;
+       int surroundingX=allBubble[fakeTop][j].surroundingCoordinate[k].x;
+       if(surroundingY!=-1&&surroundingX!=-1&&surroundingY>=fakeTop){
          Offset addNode = Offset(surroundingX.toDouble(),surroundingY.toDouble(),);
          mustCheckedList.add(addNode);
 
@@ -355,7 +355,7 @@ class BubbleService extends ChangeNotifier {
          int mustX= mustCheckedList.elementAt(0).dx.toInt();
 
           bool isTopRowBubble=mustY==0?true:false;
-          if(mustY!=-1&&mustX!=-1){
+          if(mustY!=-1&&mustX!=-1&&mustY>=fakeTop){
 
             if(allBubble[mustY][mustX].bubbleColor!=BubbleColor0){
 
@@ -375,7 +375,7 @@ class BubbleService extends ChangeNotifier {
                 for(int b=0;b<2;b++){
                   int aboveY = allBubble[mustY][mustX].surroundingCoordinate[b].y;
                   int aboveX = allBubble[mustY][mustX].surroundingCoordinate[b].x;
-                  if(aboveY!=-1&&aboveX!=-1){
+                  if(aboveY!=-1&&aboveX!=-1 &&aboveY>=fakeTop){
                     if(allBubble[aboveY][aboveX].bubbleColor==BubbleColor0){
                       // means node is empty bubbleColor0 = transparent
                       supportedAboveNodes.add(false);
