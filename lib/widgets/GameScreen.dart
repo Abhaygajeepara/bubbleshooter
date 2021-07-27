@@ -29,11 +29,17 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bubbleData= context.read(buubleProvider);
     final size = MediaQuery.of(context).size;
     SystemChrome.setEnabledSystemUIOverlays([]);
     bx = size.width /2;
     by = size.height  * .15;
+    final singleBubbleHeight=size.height*0.9/21;
+    double calculateDisplayRatio = singleBubbleHeight*bubbleData.displayBubbleColumn;
+    final bubbleDisplayRatio = calculateDisplayRatio>=size.height*0.7?size.height*0.7:calculateDisplayRatio; // remove +singleBubbleHeight if not look right
+
     return Scaffold(
+
         backgroundColor: Colors.amber,
         body: Consumer(builder: (context, watch, child) {
           final bubbleData = watch(buubleProvider);
@@ -47,11 +53,12 @@ class _GameScreenState extends State<GameScreen> {
                 // ),
                 Container(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                          child: Container(
-                              height: size.height * 0.9,
-                              child: Center(child: BubblePanel()))),
+                      Container(
+
+                          height: bubbleDisplayRatio,
+                          child: Center(child: BubblePanel())),
                       Container(
 
                           child: BotomSection()),

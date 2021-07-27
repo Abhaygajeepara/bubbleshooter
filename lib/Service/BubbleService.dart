@@ -8,26 +8,112 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BubbleService extends ChangeNotifier {
   List bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3, BubbleColor0];
+
+  // for gameScreen
+  int displayBubbleColumn=10;
+  int currentTopColumn=10;
+
+  // calculation
   List<List<Bubble>> allBubble = [];
   List<Color> firedBubbleColor = [];
   int moves = 10;
-  int  bubbleColorInLevel =2;
- int bubbleColumns =11;
- int numberSurroundingNodes =6;
-
-int targetY=-1;
-int targetX=-1;
-
+  int bubbleColorInLevel = 2;
+  int bubbleColumns = 40;
+  int numberSurroundingNodes = 6;
+  int maximumNodeInOneRow = 11;
+  int fakeTop=0;
 
 
-setTarget (int y,int x){
-  this.targetY=y;
-  this.targetX=x;
-  notifyListeners();
-}
+  // target node
+  int targetY = -1;
+  int targetX = -1;
+// lazy loading
+  int startAdding = 0;
+  int endAdding = 25;
 
-  int fixColumn =10; // remove after testing
+  setStartAndEnd(int start, int end) {
+    this.startAdding = start;
+    this.endAdding = end;
+  }
+
+  setTarget(int y, int x) {
+    this.targetY = y;
+    this.targetX = x;
+    notifyListeners();
+  }
+
+  setFakeTop(){
+    int number =bubbleColumns-10;
+    if(number<=0){
+      fakeTop=0;
+    }
+    else{
+      fakeTop=number;
+    }
+    print('faketop${fakeTop}');
+  }
+
+  //int fixColumn =10; // remove after testing
+  resetAllBubble() {
+    allBubble.clear();
+  }
+
   setDefaultData() {
+    //allBubble = [];
+
+    for (int i = startAdding; i < endAdding; i++) {
+      List<Bubble> listOfBubbleColumn = [];
+      if (i == bubbleColumns - 1) {
+        listOfBubbleColumn = emptyRow(i);
+      } else {
+        listOfBubbleColumn = setSingleRow(i);
+      }
+
+      allBubble.add(listOfBubbleColumn);
+    }
+    setFakeTop();
+  }
+
+  List<Bubble>  setSingleRow(int i){
+    List<Bubble> listOfBubbleColumn=[];
+    Color bubbleColor = BubbleColor0;
+    int numberofNodesInRow;
+    if(i%2==0){
+      numberofNodesInRow =11;
+    }else{
+      numberofNodesInRow =10;
+    }
+    for (int j = 0; j < numberofNodesInRow; j++) {
+      bubbleColor = BubbleColor0;
+      var rng = new Random();
+      int rand = rng.nextInt(bubbleColorInLevel);
+      bubbleColor = bubbleColors[rand];
+
+      Bubble  single = singleBubble(i, j,bubbleColor);
+      listOfBubbleColumn.add(single);
+
+
+    }
+    return listOfBubbleColumn;
+  }
+
+  List<Bubble>  emptyRow(int i){
+    List<Bubble> listOfBubbleColumn=[];
+    Color bubbleColor = BubbleColor0;
+    int numberofNodesInRow;
+    if(i%2==0){
+      numberofNodesInRow =11;
+    }else{
+      numberofNodesInRow =10;
+    }
+    for (int j = 0; j < numberofNodesInRow; j++) {
+      Bubble  single = singleBubble(i, j,bubbleColor);
+      listOfBubbleColumn.add(single);
+    }
+    return listOfBubbleColumn;
+  }
+/*
+*   setDefaultData() {
     allBubble = [];
     Color bubbleColor = BubbleColor0;
 
@@ -43,31 +129,10 @@ setTarget (int y,int x){
       }
       for (int j = 0; j < numberofNodesInRow; j++) {
         bubbleColor = BubbleColor0;
-        if (i < fixColumn) {
-          var rng = new Random();
-          int rand = rng.nextInt(bubbleColorInLevel);
-          bubbleColor = bubbleColors[rand];
-        }
-        // if(i<=3){
-        //   localColor = BubbleColor1;
-        // }
-        // else if(i>3&& i<6){
-        //   localColor = BubbleColor2;
-        // }
-        // else if(i>=6&& i<7){
-        //   localColor = BubbleColor3;
-        // }
-        // else{
-        //   localColor = BubbleColor0;
-        // }
-        // if(j==9 ){
-        //   localColor = BubbleColor2;
-        // }if(j==0 ){
-        //   localColor = BubbleColor2;
-        // }
-        // if(i==6){
-        //   localColor = BubbleColor3;
-        // }
+        var rng = new Random();
+        int rand = rng.nextInt(bubbleColorInLevel);
+        bubbleColor = bubbleColors[rand];
+
         Bubble  single = singleBubble(i, j,bubbleColor);
         listOfBubbleColumn.add(single);
 
@@ -82,9 +147,9 @@ setTarget (int y,int x){
     //   }
     //   //print('new');
     // }
-    notifyListeners();
-  }
 
+  }
+* */
   Bubble singleBubble(int i, int j,Color newColor) {
     int top = i - 1;
     int bottom = i + 1;
@@ -145,7 +210,7 @@ setTarget (int y,int x){
       tops =[
         BubblesCoordinate(y: top, x: left),
         BubblesCoordinate(y: top, x: k),
-       
+
       ];
       bottoms =[
         BubblesCoordinate(y: bottom, x: left),
@@ -153,7 +218,7 @@ setTarget (int y,int x){
       ];
     }
     //   List<List> coordinate =[[top,left],[top,j],[top,right],[i,left],[i,right],[bottom,left],[bottom,j],[bottom,right]];
-    
+
     List<BubblesCoordinate> surroundingCoordinate = [
      tops[0],
       tops[1],
@@ -161,7 +226,7 @@ setTarget (int y,int x){
       BubblesCoordinate(y: i, x: right),
       bottoms[0],
       bottoms[1]
-    
+
     ];
 
     BubblesCoordinate bubbleCoordinate = BubblesCoordinate(y: i, x: j);
@@ -183,14 +248,14 @@ setTarget (int y,int x){
       firedBubbleColor.add(bubbleColors[rand]);
 
     }
-    notifyListeners();
+    // notifyListeners();
   }
 
   removeFiredColorFromQueue(int index){
     firedBubbleColor.removeAt(index);
     moves=moves-1;
 
-    notifyListeners();
+
   }
 
   firedFunction( )async{
@@ -388,7 +453,7 @@ setTarget (int y,int x){
 // }
 bool checkingContinue = true;
 int checkNodeLength=checkedNode.length;
- print("abhay" +checkedNode.length.toString());
+
 do{
   bool valueChanged = false;
 
@@ -448,55 +513,12 @@ do{
     //function over
   }
 
-  List<BubblesCoordinate> calculateRemoveRow(List<BubblesCoordinate> fallNodeList){
-    List<BubblesCoordinate> removeRows =[];
-    int emptyRow =-1;
-    // check all bubble nodes Column
-    for(int a=0;a<bubbleColumns;a++){
-      int removeY=a;
-      List<bool> removeBelowRow=[];
-      for(int b=0;b<allBubble[a].length;b++){
-        int removeX =b;
-        if(allBubble[removeY][removeX].bubbleColor==BubbleColor0){
-          removeBelowRow.add(true);
-        }else{
-          removeBelowRow.add(false);
-        }
 
-      }
-      if(removeBelowRow.contains(false)){}else{
-        emptyRow=a;
-        break;
-      // loop stop at when it find empty row(every node of this row does have transparent color)
-      }
-    }
-  // add nodes which needs to be fall
-    if(emptyRow>-1){
-      for(int j=emptyRow+1;j<bubbleColumns;j++){
-        int removeRowIndexY = j;
-        for(int c=0;c<allBubble[removeRowIndexY].length;c++){
-          int rowX =c;
 
-         if(allBubble[removeRowIndexY][rowX].bubbleColor!=BubbleColor0){
-
-           BubblesCoordinate coordinate =assignCoordinates(removeRowIndexY,rowX);
-           if(fallNodeList.contains(coordinate)){
-
-           }else{
-             removeRows.add(coordinate);
-           }
-         }
-
-        }
-      }
-    }
-
-    return removeRows;
-  }
-  fallMethod(List<BubblesCoordinate> fallNodeList){
+  fallMethod(List<Offset> fallNodeList){
     for(int i=0;i<fallNodeList.length;i++){
-      int y = fallNodeList[i].y;
-      int x = fallNodeList[i].x;
+      int y = fallNodeList.elementAt(i).dy.toInt();
+      int x = fallNodeList.elementAt(i).dx.toInt();
       Bubble bubble= assignNewValueToBubbleClass(y, x, Colors.black);
     }
   }
@@ -516,6 +538,52 @@ do{
 
 
 // remove later
+
+// List<BubblesCoordinate> calculateRemoveRow(List<BubblesCoordinate> fallNodeList){
+//   List<BubblesCoordinate> removeRows =[];
+//   int emptyRow =-1;
+//   // check all bubble nodes Column
+//   for(int a=0;a<bubbleColumns;a++){
+//     int removeY=a;
+//     List<bool> removeBelowRow=[];
+//     for(int b=0;b<currentScreenBubble[a].length;b++){
+//       int removeX =b;
+//       if(currentScreenBubble[removeY][removeX].bubbleColor==BubbleColor0){
+//         removeBelowRow.add(true);
+//       }else{
+//         removeBelowRow.add(false);
+//       }
+//
+//     }
+//     if(removeBelowRow.contains(false)){}else{
+//       emptyRow=a;
+//       break;
+//       // loop stop at when it find empty row(every node of this row does have transparent color)
+//     }
+//   }
+//   // add nodes which needs to be fall
+//   if(emptyRow>-1){
+//     for(int j=emptyRow+1;j<bubbleColumns;j++){
+//       int removeRowIndexY = j;
+//       for(int c=0;c<currentScreenBubble[removeRowIndexY].length;c++){
+//         int rowX =c;
+//
+//         if(currentScreenBubble[removeRowIndexY][rowX].bubbleColor!=BubbleColor0){
+//
+//           BubblesCoordinate coordinate =assignCoordinates(removeRowIndexY,rowX);
+//           if(fallNodeList.contains(coordinate)){
+//
+//           }else{
+//             removeRows.add(coordinate);
+//           }
+//         }
+//
+//       }
+//     }
+//   }
+//
+//   return removeRows;
+// }
 
 // fall functionality
 

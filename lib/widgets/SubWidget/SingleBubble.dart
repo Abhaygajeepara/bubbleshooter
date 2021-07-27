@@ -51,9 +51,9 @@ class _SingleBubbleState extends State<SingleBubble> {
               ],
               shape: BoxShape.circle),
           width: size.width*0.99 / 11,
-          // child: Center(child:
-          //
-          // Text('${index},${subIndex}',style: TextStyle(color: Colors.white),)),
+          child: Center(child:
+
+          Text('${widget.y},${widget.x}',style: TextStyle(color: Colors.yellow,fontSize: 10),)),
         ),
       ),
     );

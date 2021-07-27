@@ -20,12 +20,13 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.read(buubleProvider).setDefaultData();
-    context.read(buubleProvider).assignColorToFiredBubbleColor();
+
   }
   @override
   Widget build(BuildContext context) {
 
+  //  context.read(buubleProvider).setDefaultData();
+    context.read(buubleProvider).assignColorToFiredBubbleColor();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
