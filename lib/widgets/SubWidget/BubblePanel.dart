@@ -46,18 +46,18 @@ class _BubblePanelState extends State<BubblePanel> {
     final bubbleData= context.read(buubleProvider);
     bubbleData.resetAllBubble();
     bubbleData.setDefaultData();
-    print(bubbleData.allBubble.length);
+ //   print(bubbleData.allBubble.length);
   }
 
   _startTimer() {
     _timer = Timer.periodic(Duration(milliseconds:1500 ), (_) {
       setState(() {
-        _addMessage();
+        _addBubble();
         _needsScroll = true;
       });
     });
   }
-  _addMessage() async{
+  _addBubble() async{
     final bubbleData= context.read(buubleProvider);
     if(bubbleData.startAdding ==bubbleData.bubbleColumns){
 
@@ -68,7 +68,7 @@ class _BubblePanelState extends State<BubblePanel> {
       await bubbleData.setDefaultData();
 
     }
-    print(bubbleData.allBubble .length);
+  //  print(bubbleData.allBubble .length);
 
 
   }
@@ -89,6 +89,7 @@ class _BubblePanelState extends State<BubblePanel> {
       end =end+newadd;
       stopAdd=true;
 
+
       setState(() {
 
       });
@@ -100,11 +101,13 @@ class _BubblePanelState extends State<BubblePanel> {
 
 
   _scrollToEnd() async {
-    if (_needsScroll) {
-      _needsScroll = false;
-      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 2000), curve: Curves.easeInOut);
-    }
+    // if (_needsScroll) {
+    //   _needsScroll = false;
+    //   _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+    //       duration: Duration(milliseconds: 2000), curve: Curves.easeInOut);
+    // }
+    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 2000), curve: Curves.easeInOut);
   }
  @override
 
@@ -138,7 +141,7 @@ class _BubblePanelState extends State<BubblePanel> {
                   itemBuilder: (context, subIndex) {
 
                     return SingleBubble(
-                        buubleColor: bubbleData.allBubble[index][subIndex].bubbleColor,y: index,x: subIndex,);
+                        buubleColor: bubbleData.allBubble[index][subIndex].bubbleColor,y: index,x: subIndex,isVisible:bubbleData.allBubble[index][subIndex].isVisible ,);
                   }),
             ),
           );

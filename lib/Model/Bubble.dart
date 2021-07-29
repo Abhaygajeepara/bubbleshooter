@@ -4,10 +4,12 @@ class Bubble {
   Color bubbleColor;
   BubblesCoordinate bubbleCoordinate;
   List<BubblesCoordinate> surroundingCoordinate;
+  bool isVisible;
   Bubble({
     required this.bubbleColor,
     required this.bubbleCoordinate,
     required this.surroundingCoordinate,
+    required this.isVisible
   });
 }
 

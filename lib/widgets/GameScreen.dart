@@ -97,7 +97,7 @@ class _GameScreenState extends State<GameScreen> {
             return Container(
                 height: size.height * 0.8,
                 //  width: size.width*0.4/2,
-                child: SingleBubble(buubleColor:bubbleData.firedBubbleColor[index + 1],y: 0,x: 0,));
+                child: SingleBubble(buubleColor:bubbleData.firedBubbleColor[index + 1],y: 0,x: 0,isVisible: true,));
           }),
     );
   }

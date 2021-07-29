@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:bubble/Common/Commonvalue.dart';
@@ -7,10 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BubbleService extends ChangeNotifier {
-  List bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3, BubbleColor0];
+  List<Color> bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3];
+ // List bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3, BubbleColor0];
 
   // for gameScreen
-  int displayBubbleColumn=20;
+  int displayBubbleColumn=10;
   //int currentTopColumn=10;
 
   // calculation
@@ -30,6 +32,9 @@ class BubbleService extends ChangeNotifier {
 // lazy loading
   int startAdding = 0;
   int endAdding = 25;
+  //remove fall nodes
+  List<BubblesCoordinate> removeCoordinatedMain=[];
+  Set<Offset> fallingNodesMain=Set();
 
   setStartAndEnd(int start, int end) {
     this.startAdding = start;
@@ -43,6 +48,7 @@ class BubbleService extends ChangeNotifier {
   }
 
   setFakeTop(){
+
     int number =bubbleColumns-10;
     if(number<=0){
       fakeTop=0;
@@ -52,7 +58,9 @@ class BubbleService extends ChangeNotifier {
     }
     print('faketop${fakeTop}');
   }
-
+  setDisplayBubbleColumn(int val ){
+    displayBubbleColumn=val;
+  }
   //int fixColumn =10; // remove after testing
   resetAllBubble() {
     allBubble.clear();
@@ -235,7 +243,10 @@ class BubbleService extends ChangeNotifier {
         // bubbleColor: bubbleColor,
           bubbleColor: newColor,
         bubbleCoordinate: bubbleCoordinate,
-        surroundingCoordinate: surroundingCoordinate);
+        surroundingCoordinate: surroundingCoordinate,
+        isVisible: true
+    );
+
     return _bu;
   }
 
@@ -262,8 +273,10 @@ class BubbleService extends ChangeNotifier {
   int y = this.targetY;
   int x = this.targetX;
   Color newBubble = firedBubbleColor[0];
+  removeCoordinatedMain=[];
+fallingNodesMain=Set();
   if( y !=-1&& x!=-1){
-    assignNewValueToBubbleClass(y, x, newBubble); // set new Color to define node
+    assignNewValueToBubbleClass(y, x, newBubble,true); // set new Color to define node
 
     List<BubblesCoordinate> removeNode =[];
     List<BubblesCoordinate> actualRemoveNode =[];
@@ -305,15 +318,25 @@ class BubbleService extends ChangeNotifier {
             }
           }
         }
-        assignNewValueToBubbleClass(removeY, removeX, Colors.transparent);
+        assignNewValueToBubbleClass(removeY, removeX, Colors.orange,false);
+        Timer(Duration(milliseconds: 500), () {
+          assignNewValueToBubbleClass(removeY, removeX, Colors.transparent,true);
+        });
+       // removeCoordinatedMain.add( removeNode[j]);
+
+
 
         removeNode.removeAt(j);
 
       }
     }while(removeNode.length !=0);
+if(removeNode.length !=0){
 
+  notifyListeners();
+}  notifyListeners();
     calculateFalling();
-    notifyListeners();
+
+
   }
     //Bubble newbubble = Bubble(bubbleColor: newBubble,bubbleCoordinate: allBubble[y][x].bubbleCoordinate,surroundingCoordinate:allBubble[y][x].surroundingCoordinate );
 
@@ -322,11 +345,11 @@ class BubbleService extends ChangeNotifier {
   calculateFalling(){
  final Set<Offset> checkedNode =Set();
   final Set<Offset> mustCheckedList =Set();
-
+ fallingNodesMain=Set();
 
  for(int j =0;j<allBubble[fakeTop].length;j++){
 
-   if(allBubble[fakeTop][j].bubbleColor!=BubbleColor0){
+   if(bubbleColors.contains(allBubble[fakeTop][j].bubbleColor)){
      int rowY = allBubble[fakeTop][j].bubbleCoordinate.y;
      int rowX = allBubble[fakeTop][j].bubbleCoordinate.x;
      Offset addCheckOffset=Offset(rowX.toDouble(), rowY.toDouble());
@@ -357,7 +380,7 @@ class BubbleService extends ChangeNotifier {
           bool isTopRowBubble=mustY==0?true:false;
           if(mustY!=-1&&mustX!=-1&&mustY>=fakeTop){
 
-            if(allBubble[mustY][mustX].bubbleColor!=BubbleColor0){
+            if(bubbleColors.contains(allBubble[mustY][mustX].bubbleColor)){
 
               if(isTopRowBubble){
                 // then check node color if node's bubble color is  transparent then ignore the node
@@ -459,7 +482,7 @@ do{
 
   for(int i =0;i<allBubble.length;i++){
     for(int j=0;j<allBubble[i].length;j++){
-      if(allBubble[i][j].bubbleColor!=BubbleColor0){
+      if(bubbleColors.contains(allBubble[i][j].bubbleColor)){
         int offsetY =allBubble[i][j].bubbleCoordinate.y;
         int offsetX =allBubble[i][j].bubbleCoordinate.x;
         Offset guessOffset = Offset(offsetX.toDouble(),offsetY.toDouble());
@@ -473,7 +496,7 @@ do{
            if(checkedNode.contains(surrondingOffset)){
              valueChanged =true;
              checkedNode.add(guessOffset);
-             print( "chhedd="+ surrondingOffset.toString());
+          //   print( "chhedd="+ surrondingOffset.toString());
 
            }
           }
@@ -490,18 +513,19 @@ do{
     checkingContinue=false;
   }
 
-  print('chaned'+valueChanged.toString());
-}while(checkingContinue!=false);
 
+}while(checkingContinue!=false);
+// check is node check or not
     for(int i =0;i<allBubble.length;i++){
       for(int j=0;j<allBubble[i].length;j++){
-        if(allBubble[i][j].bubbleColor!=BubbleColor0){
+        if(bubbleColors.contains(allBubble[i][j].bubbleColor)){
           int offsetY =allBubble[i][j].bubbleCoordinate.y;
           int offsetX =allBubble[i][j].bubbleCoordinate.x;
           Offset guessOffset = Offset(offsetX.toDouble(),offsetY.toDouble());
 
           if(checkedNode.contains(guessOffset)==false){
-            allBubble[i][j].bubbleColor=Colors.white;
+            // allBubble[i][j].bubbleColor=Colors.white;
+            fallingNodesMain.add(guessOffset);
           }
 
         }
@@ -510,22 +534,34 @@ do{
     }
 
     setTarget(-1, -1);
+  //  removeRow();
+  //  fallAndRemoveMethod();
     //function over
   }
 
 
 
-  fallMethod(List<Offset> fallNodeList){
-    for(int i=0;i<fallNodeList.length;i++){
-      int y = fallNodeList.elementAt(i).dy.toInt();
-      int x = fallNodeList.elementAt(i).dx.toInt();
-      Bubble bubble= assignNewValueToBubbleClass(y, x, Colors.black);
+  fallAndRemoveMethod(){
+    //falling
+    for(int i=0;i<fallingNodesMain.length;i++){
+      int y = fallingNodesMain.elementAt(i).dy.toInt();
+      int x = fallingNodesMain.elementAt(i).dx.toInt();
+      // change
+    assignNewValueToBubbleClass(y, x, Colors.white,true);
     }
+    for(int i=0;i<removeCoordinatedMain.length;i++){
+      int _y = removeCoordinatedMain[i].y;
+      int _x = removeCoordinatedMain[i].x;
+      // change
+     assignNewValueToBubbleClass(_y, _x, Colors.transparent,true);
+    }
+notifyListeners();
+
   }
 
-  Bubble assignNewValueToBubbleClass(int y,int x,Color newColor){
+  Bubble assignNewValueToBubbleClass(int y,int x,Color newColor,bool visible){
 
-    Bubble newbubble = Bubble(bubbleColor: newColor,bubbleCoordinate: allBubble[y][x].bubbleCoordinate,surroundingCoordinate:allBubble[y][x].surroundingCoordinate );
+    Bubble newbubble = Bubble(bubbleColor: newColor,bubbleCoordinate: allBubble[y][x].bubbleCoordinate,surroundingCoordinate:allBubble[y][x].surroundingCoordinate,  isVisible: visible   );
     allBubble[y][x] =newbubble;
     return newbubble;
   }
@@ -533,8 +569,47 @@ do{
     BubblesCoordinate value = BubblesCoordinate(y: y,x: x);
     return value;
   }
+  removeRow(){
+    int _st=allBubble.length-1;
+    int _en=allBubble.length-displayBubbleColumn;
+    int numberOfEmptyRow =0;
+    for(int i= _st;i>_en;i--){
+    List<bool> addBool =[];
+      for(int j=0;j<allBubble[i].length;j++){
 
+        if(bubbleColors.contains(allBubble[i][j].bubbleColor)){
+          addBool.add(false);
+        }
+        else{
+          addBool.add(true);
+        }
+      }
+
+      if(addBool.contains(false)){
+
+
+      }else{
+        numberOfEmptyRow=numberOfEmptyRow+1;
+        if(numberOfEmptyRow>1){
+          allBubble.removeAt(i);
+          _st=allBubble.length-1;
+          _en=allBubble.length-displayBubbleColumn;
+          bubbleColumns=allBubble.length;
+        }
+
+      //  displayBubbleColumn=displayBubbleColumn-1;
+
+      }
+
+    }
+
+setFakeTop();
+
+
+  }
 }
+
+
 
 
 // remove later

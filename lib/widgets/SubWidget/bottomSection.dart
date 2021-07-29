@@ -70,10 +70,11 @@ class _BotomSectionState extends State<BotomSection> {
                 bubbleData.firedBubbleColor.length <= 0
                     ? Container()
                     : FiredBubble(bubbleColor:bubbleData.firedBubbleColor[0]),
-                ElevatedButton(onPressed: (){
+                ElevatedButton(onPressed: ()async{
                   if(bubbleData.firedBubbleColor.length!=0){
-                    bubbleData.firedFunction();
-                    bubbleData.removeFiredColorFromQueue(0);
+                  await  bubbleData.firedFunction();
+                await    bubbleData.removeFiredColorFromQueue(0);
+                await bubbleData.fallAndRemoveMethod();
                   }else{
                     showDialog(context: context,
                    builder: (context){
