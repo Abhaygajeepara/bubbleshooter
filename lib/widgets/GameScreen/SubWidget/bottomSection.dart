@@ -1,9 +1,12 @@
+import 'package:bubble/Common/Commonvalue.dart';
 import 'package:bubble/main.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'firedBubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BotomSection extends StatefulWidget {
+class BotomSection extends StatefulHookWidget {
   @override
   _BotomSectionState createState() => _BotomSectionState();
 }
@@ -15,15 +18,19 @@ class _BotomSectionState extends State<BotomSection> {
   double dx = 0;
   @override
   Widget build(BuildContext context) {
-   final bubbleData= context.read(buubleProvider);
+   final bubbleData= useProvider(bubbleProvider);
     final size = MediaQuery.of(context).size;
     bx = size.width /2;
     by = size.height  * .15;
+
     return GestureDetector(
+      onPanEnd: (val){
+        print("pan end");
+      },
       onPanDown: (val){
         x = val.localPosition.dx;
         y = val.localPosition.dy;
-       // print(x.toString()+"//"+y.toString());
+        // print('x='+x.toString()+"//"+"y=" +y.toString());
       },
       onPanUpdate: (val){
         x = val.localPosition.dx;
@@ -48,11 +55,12 @@ class _BotomSectionState extends State<BotomSection> {
 
         });
         // print("on upfdate" + x.toString()+"///"+y.toString());
+        // print("bx"+bx.toString()+"by"+by.toString()+"dx"+dx.toString()+"dy"+dy.toString());
       },
       child: Container(
           height: size.height * 0.3,
           width: size.width,
-          color: Colors.black,
+          color: bottomBarBgColor,
           child: CustomPaint(
             painter: customPaintrt(bx,by,dx,dy),
             child: Row(
@@ -74,7 +82,8 @@ class _BotomSectionState extends State<BotomSection> {
                   if(bubbleData.firedBubbleColor.length!=0){
                   await  bubbleData.firedFunction();
                 await    bubbleData.removeFiredColorFromQueue(0);
-                await bubbleData.fallAndRemoveMethod();
+                //await bubbleData.fallAndRemoveMethod();
+              //  await bubbleData.removeRow();
                   }else{
                     showDialog(context: context,
                    builder: (context){

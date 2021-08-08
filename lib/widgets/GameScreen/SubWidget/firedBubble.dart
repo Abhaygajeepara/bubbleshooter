@@ -13,7 +13,7 @@ class _FiredBubbleState extends State<FiredBubble> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final bubbleData= context.read(buubleProvider);
+    final bubbleData= context.read(bubbleProvider);
     return Padding(
       padding:  EdgeInsets.symmetric(horizontal: 0.1),
       child: Container(

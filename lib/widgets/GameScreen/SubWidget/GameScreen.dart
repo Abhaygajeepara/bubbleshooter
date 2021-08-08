@@ -1,14 +1,19 @@
 import 'dart:math';
 
+import 'package:bubble/Common/Commonvalue.dart';
 import 'package:bubble/Model/Bubble.dart';
 import 'package:bubble/Service/BubbleService.dart';
 import 'package:bubble/main.dart';
-import 'package:bubble/widgets/SubWidget/BubblePanel.dart';
-import 'SubWidget/SingleBubble.dart';
-import 'SubWidget/bottomSection.dart';
+import 'package:bubble/widgets/GameScreen/SubWidget/BubblePanel.dart';
+import 'package:bubble/widgets/GameScreen/SubWidget/ScorerBar.dart';
+import 'package:bubble/widgets/GameScreen/SubWidget/SingleBubble.dart';
+import 'package:bubble/widgets/GameScreen/SubWidget/bottomSection.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class GameScreen extends StatefulWidget {
   @override
@@ -29,46 +34,34 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bubbleData= context.read(buubleProvider);
+    final provider= context.read(bubbleProvider);
     final size = MediaQuery.of(context).size;
     SystemChrome.setEnabledSystemUIOverlays([]);
     bx = size.width /2;
     by = size.height  * .15;
     final singleBubbleHeight=size.height*0.9/21;
-    double calculateDisplayRatio = singleBubbleHeight*bubbleData.displayBubbleColumn;
+    double calculateDisplayRatio = singleBubbleHeight*provider.displayBubbleColumn;
     final bubbleDisplayRatio = calculateDisplayRatio>=size.height*0.7?size.height*0.7:calculateDisplayRatio; // remove +singleBubbleHeight if not look right
 
     return Scaffold(
 
-        backgroundColor: Colors.amber,
-        body: Consumer(builder: (context, watch, child) {
-          final bubbleData = watch(buubleProvider);
-          return Container(
-            child: Stack(
-              children: [
-                // Container(
-                //   height: size.height,
-                //   width: size.width,
-                //   child: Image.asset('assets/backgroud.jpg', fit: BoxFit.fill),
-                // ),
-                Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
+        backgroundColor: gameBoardColor,
+        body: Container(
+          child: Column(
+            children: [
+              ScorerBar(),
 
-                          height: bubbleDisplayRatio,
-                          child: Center(child: BubblePanel())),
-                      Container(
+              Container(
 
-                          child: BotomSection()),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        }));
+                // height: bubbleDisplayRatio,
+                  height: size.height*0.65,
+                  child: Center(child: BubblePanel())),
+              BotomSection(),
+            ],
+          )
+        )
+
+    );
   }
 
 

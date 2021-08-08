@@ -18,6 +18,7 @@ class _SingleBubbleState extends State<SingleBubble> with TickerProviderStateMix
     late AnimationController _animationController;
 late  Animation _animation;
     Offset offset = Offset.zero;
+GlobalKey key= GlobalKey();
 @override
   void initState() {
     // TODO: implement initState
@@ -32,10 +33,12 @@ late  Animation _animation;
 
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    final bubbleData= context.read(buubleProvider);
+    final bubbleData= context.read(bubbleProvider);
     final con=bubbleData.targetY==38 && bubbleData.targetX==3;
 
+
     Color borderColor =bubbleData.targetY==widget.y&&bubbleData.targetX==widget.x?Colors.brown:Colors.transparent;
+
 
     return GestureDetector(
       onTap: (){
@@ -46,14 +49,16 @@ late  Animation _animation;
         });
       },
       child: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: 0.1),
-        child: AnimatedOpacity(
+
+        padding:  EdgeInsets.symmetric(horizontal: 1),
+        child:  AnimatedOpacity(
 
           opacity: widget.isVisible ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 1000),
+          duration: const Duration(milliseconds: 200),
           child: Transform.translate(
             offset:con?Offset(0.0, 1): Offset(0.0, 0.0),
             child: Container(
+              key: key,
               decoration: BoxDecoration(
                   color: widget.buubleColor,
                   border: Border.all(
@@ -73,8 +78,8 @@ late  Animation _animation;
                       spreadRadius: 0.0,
                       offset: Offset(2.0, 2.0),
                     ),
-                  ],
-                  shape: BoxShape.circle),
+                  ], shape: BoxShape.circle
+              ),
               width: width*0.99 / 11,
               child: Center(child:
 
@@ -84,5 +89,17 @@ late  Animation _animation;
         ),
       ),
     );
+  }
+}
+extension GlobalKeyExtension on GlobalKey {
+  Rect? get globalPaintBounds {
+    final renderObject = currentContext?.findRenderObject();
+    var translation = renderObject?.getTransformTo(null).getTranslation();
+    if (translation != null && renderObject!.paintBounds != null) {
+      return renderObject.paintBounds
+          .shift(Offset(translation.x, translation.y));
+    } else {
+      return null;
+    }
   }
 }
