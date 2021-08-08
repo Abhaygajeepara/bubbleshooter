@@ -18,3 +18,8 @@ const gameBoardColor = Colors.blueGrey;
 
 // bottomBar
 const bottomBarBgColor =Colors.transparent;
+
+
+// bubble values
+const int numberOfBubbleInRow = 11;
+const int totalPaddingInRow = 14;

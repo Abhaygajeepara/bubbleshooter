@@ -4,27 +4,32 @@ import 'dart:math';
 
 import 'package:bubble/Common/Commonvalue.dart';
 import 'package:flutter/material.dart';
-int maxRaw = 40;
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+int maxRaw = 10;
+final jBubbleProvider = ChangeNotifierProvider<BubbleNotifier>((_ref)=>BubbleNotifier());
 class BubbleNotifier extends ChangeNotifier{
   List<List<BubbleModel>> bubbles = [];
+  bool isInitialized = false;
   List<Color> bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3];
   BubbleNotifier();
   void init(Size size){
-
-    for(int i =0;i<40;i++){
-      int a = i % 2 == 0 ? 11 : 10;
-      List<BubbleModel> raw = [];
-      for(int j =0;j<a;j++){
-        Color bubbleColor = BubbleColor0;
-        var rng = new Random();
-        int random = rng.nextInt(3);
-        bubbleColor = bubbleColors[random];
-        raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true));
+    if(!isInitialized){
+      bubbles.clear();
+      for(int i =0;i<maxRaw;i++){
+        int a = i % 2 == 0 ? 11 : 10;
+        List<BubbleModel> raw = [];
+        for(int j =0;j<a;j++){
+          Color bubbleColor = BubbleColor0;
+          var rng = new Random();
+          int random = rng.nextInt(3);
+          bubbleColor = bubbleColors[random];
+          raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true));
+        }
+        bubbles.add(raw);
       }
-      bubbles.add(raw);
+      // notifyListeners();
     }
   }
-
 }
 class BubbleModel{
   Color bubbleColor;
@@ -46,10 +51,13 @@ class BubbleModel{
    setPosition();
   }
   void setPosition(){
-    double ballWidth = (size.width - 22) / 11;
+    double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
     double initialTop = 0;
-    top = initialTop  + (ballWidth + 1) * i;
+    top = initialTop  + (ballWidth -2) * i;
     left = 1 +(ballWidth+1)*j;
+    if(i % 2 != 0){
+      left = left + ballWidth /2;
+    }
   }
   void setSurroundings(){
     bubbleCoordinate = Offset(i.toDouble(), j.toDouble());
