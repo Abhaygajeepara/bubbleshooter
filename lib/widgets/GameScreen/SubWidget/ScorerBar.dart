@@ -1,11 +1,13 @@
 import 'package:bubble/Common/Commonvalue.dart';
 import 'package:bubble/Service/BubbleService.dart';
+import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ScorerBar extends StatefulHookWidget {
+  const ScorerBar();
   @override
   _ScorerBarState createState() => _ScorerBarState();
 }
@@ -35,7 +37,7 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
     super.dispose();
 
   }
-  applyAnimation(BubbleService provider ){
+  applyAnimation(BubbleNotifier provider ){
 
       percentageAnimation=Tween(begin: provider.oldScorerPercentage,end: provider.currentScorerPercentage).animate(CurvedAnimation(parent: percentageController, curve: Curves.ease))..addListener(() {
         setState(() {});
@@ -76,7 +78,7 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
   @override
 
   Widget build(BuildContext context) {
-    final provider = useProvider(bubbleProvider);
+    final provider = useProvider(jBubbleProvider);
     applyAnimation(provider);
     final size =MediaQuery.of(context).size;
     BorderRadius  borderRadius= BorderRadius.circular(20.0);
@@ -116,8 +118,9 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
                       ),
                     ),
                     Container(
+                     // constraints: BoxConstraints(minWidth: 0, maxWidth:  0),
                       height: size.height*0.03,
-                      width: (size.width*0.006*percentageAnimation.value),
+                      width:  percentageAnimation.value!=0? (size.width*0.006*percentageAnimation.value):10,
 
                       decoration: BoxDecoration(
                         borderRadius: borderRadius,

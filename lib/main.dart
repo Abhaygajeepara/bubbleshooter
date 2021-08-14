@@ -29,15 +29,31 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
 
-   context.read(bubbleProvider).setDefaultData();
-    context.read(bubbleProvider).assignColorToFiredBubbleColor();
+   // context.read(bubbleProvider).setDefaultData();
+   //  context.read(bubbleProvider).assignColorToFiredBubbleColor();
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: GameScreen(),
+      home: FakeSlpash(),
     );
   }
 }
+class FakeSlpash extends StatefulWidget {
+  @override
+  _FakeSlpashState createState() => _FakeSlpashState();
+}
+
+class _FakeSlpashState extends State<FakeSlpash> {
+  @override
+  Widget build(BuildContext context) {
+    final size =MediaQuery.of(context).size;
+    context.read(jBubbleProvider).assignColorToFiredBubbleColor();
+    context.read(jBubbleProvider).init(size);
+    return GameScreen();
+  }
+}
+
+
 

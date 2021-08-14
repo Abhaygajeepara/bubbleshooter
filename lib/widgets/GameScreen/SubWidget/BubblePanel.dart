@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:bubble/Common/Commonvalue.dart';
 import 'package:bubble/Common/commmonTitle.dart';
 import 'package:bubble/Model/Bubble.dart';
+import 'package:bubble/Model/BubbleModel.dart';
+import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/main.dart';
 import 'package:bubble/widgets/GameScreen/SubWidget/SingleBubble.dart';
 
@@ -72,6 +75,7 @@ class _BubblePanelState extends State<BubblePanel>  with TickerProviderStateMixi
    //stopScroll!=true?jumpedFunction():null;
 
     final provider= useProvider(bubbleProvider);
+
    // WidgetsBinding.instance!.addPostFrameCallback((_) => _scrollToEnd());
     final size = MediaQuery.of(context).size;
     print(popAnimation.value);
@@ -147,6 +151,63 @@ class _BubblePanelState extends State<BubblePanel>  with TickerProviderStateMixi
 
   }
 }
+
+
+class JaydipWidget extends StatefulHookWidget {
+  const JaydipWidget();
+  @override
+  _JaydipWidgetState createState() => _JaydipWidgetState();
+}
+
+class _JaydipWidgetState extends State<JaydipWidget> {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    final bubbleData = useProvider(jBubbleProvider);
+
+    double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
+    return Container(
+      height: size.height * 0.65,
+      child: Stack(
+        children: [
+          for (List<BubbleModel> i in bubbleData.bubbles)
+            for (BubbleModel j in i)
+              Positioned(
+                left: j.left,
+                top: j.top,
+                child: Container(
+                  height: ballWidth,
+                  width: ballWidth,
+                  decoration: BoxDecoration(
+                      color: j.bubbleColor,
+                      border: Border.all(
+                          color: j.bubbleColor,width: 10
+                      ),
+                      boxShadow: [
+                        j.bubbleColor != Colors.transparent
+                            ? BoxShadow(
+                          color: Colors.black,
+                          blurRadius: 2.0,
+                          spreadRadius: 0.0,
+                          offset: Offset(2.0, 2.0),
+                        )
+                            : BoxShadow(
+                          color: j.bubbleColor,
+                          blurRadius: 2.0,
+                          spreadRadius: 0.0,
+                          offset: Offset(2.0, 2.0),
+                        ),
+                      ], shape: BoxShape.circle
+                  ),
+                  child: Text(i.first.i.toString()+j.j.toString()),
+                ),
+              )
+        ],
+      ),
+    );
+  }
+}
+
 
 //  resetAll(){
 //    final bubbleData= context.read(bubbleProvider);

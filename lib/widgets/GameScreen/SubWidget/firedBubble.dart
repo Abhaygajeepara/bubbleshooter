@@ -1,3 +1,4 @@
+import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +14,9 @@ class _FiredBubbleState extends State<FiredBubble> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final bubbleData= context.read(bubbleProvider);
+    // final bubbleData= context.read(bubbleProvider);
+     final bubbleData= context.read(jBubbleProvider);
+
     return Padding(
       padding:  EdgeInsets.symmetric(horizontal: 0.1),
       child: Container(

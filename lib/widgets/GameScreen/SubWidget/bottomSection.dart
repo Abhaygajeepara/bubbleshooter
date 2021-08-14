@@ -1,4 +1,5 @@
 import 'package:bubble/Common/Commonvalue.dart';
+import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/Service/LinesServices.dart';
 import 'package:bubble/main.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -8,12 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
 
-class BotomSection extends StatefulHookWidget {
+class BottomSection extends StatefulHookWidget {
+  const BottomSection();
   @override
   _BotomSectionState createState() => _BotomSectionState();
 }
 
-class _BotomSectionState extends State<BotomSection> {
+class _BotomSectionState extends State<BottomSection> {
   double x = 0,y =0;
   double bx =0,by =0;
   double dy = 0;
@@ -21,7 +23,8 @@ class _BotomSectionState extends State<BotomSection> {
   double dx = 0;
   @override
   Widget build(BuildContext context) {
-   final bubbleData= useProvider(bubbleProvider);
+   //final bubbleData= useProvider(bubbleProvider);
+   final bubbleData= useProvider(jBubbleProvider);
    final lineData = context.read(lineProvider);
     final size = MediaQuery.of(context).size;
     bx = size.width /2;
@@ -78,20 +81,21 @@ class _BotomSectionState extends State<BotomSection> {
 
                 children: [
                   //firedBubbleQueue(bubbleData),
-                  Text( "y="+bubbleData.targetY.toString()+"   "+"x="+bubbleData.targetY.toString(),
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white
-                    ),
-                  ),
-                  // bubbleData.firedBubbleColor.length <= 0
-                  //     ? Container()
-                  //     : FiredBubble(bubbleColor:bubbleData.firedBubbleColor[0]),
+                  // Text( "y="+bubbleData.targetY.toString()+"   "+"x="+bubbleData.targetY.toString(),
+                  //   style: TextStyle(
+                  //       fontSize: 16,
+                  //       fontWeight: FontWeight.bold,
+                  //       color: Colors.white
+                  //   ),
+                  // ),
+                  bubbleData.firedBubbleColor.length <= 0
+                      ? Container()
+                      : FiredBubble(bubbleColor:bubbleData.firedBubbleColor[0]),
                   ElevatedButton(onPressed: ()async{
                     if(bubbleData.firedBubbleColor.length!=0){
-                      await  bubbleData.firedFunction();
-                      await    bubbleData.removeFiredColorFromQueue(0);
+                     await  bubbleData.firedFunction(5,5);
+                   // print(bubbleData.bubbles[5][5].surroundingCoordinate);
+                     // await    bubbleData.removeFiredColorFromQueue(0);
                       //await bubbleData.fallAndRemoveMethod();
                       //  await bubbleData.removeRow();
                     }else{
@@ -105,8 +109,8 @@ class _BotomSectionState extends State<BotomSection> {
                                   Text('kal aa na'),
 
                                   ElevatedButton(onPressed: (){
-                                    bubbleData.setDefaultData();
-                                    bubbleData.assignColorToFiredBubbleColor();
+                                    // bubbleData.setDefaultData();
+                                    // bubbleData.assignColorToFiredBubbleColor();
                                     Navigator.pop(context);
 
                                   }, child: Text('restart'))

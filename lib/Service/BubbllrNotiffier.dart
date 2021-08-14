@@ -1,17 +1,59 @@
 
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:bubble/Common/Commonvalue.dart';
+import 'package:bubble/Model/BubbleModel.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-int maxRaw = 10;
+
 final jBubbleProvider = ChangeNotifierProvider<BubbleNotifier>((_ref)=>BubbleNotifier());
 class BubbleNotifier extends ChangeNotifier{
+//temporary Variable
+Color temporaryFalingColor =Colors.white;
+
+
+  ///level
+  int currentLevel =1;
+  int maxRaw = 10;
   List<List<BubbleModel>> bubbles = [];
   bool isInitialized = false;
   List<Color> bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3];
-  BubbleNotifier();
+ int bubbleColorInLevel=2;
+  // fire
+
+  List<Color> firedBubbleColor = [];
+  int fakeTop = 0;
+
+  int targetY = -1;
+  int targetX = -1;
+  //remove fall nodes
+  Set<Offset> removeCoordinatedMain = Set();
+  Set<Offset> fallingNodesMain = Set();
+//moves
+  int moves = 10;
+  // score
+  int oldScorer=0;
+  int currentScorer=0 ;
+  double currentScorerPercentage=0.0;
+  double oldScorerPercentage=0.0;
+  int fixScorer =10000;
+  int levelTargetScorer=0;
+
+  int fixNextTarget =1000;// add 1000 in fixTargetScorer
+  int fixedIncreasement=10;
+
+  // gameOver
+  bool gameOver= false;
+  BubbleNotifier(){
+    setLevelTarget(){
+      levelTargetScorer=  (fixScorer*currentLevel)+fixNextTarget;
+      print('levelTargetScorer='+levelTargetScorer.toString());
+      notifyListeners();
+    }
+  }
+  //BubbleNotifier();
   void init(Size size){
     if(!isInitialized){
       bubbles.clear();
@@ -21,76 +63,268 @@ class BubbleNotifier extends ChangeNotifier{
         for(int j =0;j<a;j++){
           Color bubbleColor = BubbleColor0;
           var rng = new Random();
-          int random = rng.nextInt(3);
+          int random = rng.nextInt(bubbleColorInLevel);
           bubbleColor = bubbleColors[random];
-          raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true));
+          raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true,maxRaw: maxRaw));
         }
         bubbles.add(raw);
       }
       // notifyListeners();
     }
   }
-}
-class BubbleModel{
-  Color bubbleColor;
-  late double left,top;
-  int  i,j;
-  late Offset bubbleCoordinate;
-  late Set<Offset> surroundingCoordinate;
-  bool isVisible;
-  Size size;
-  BubbleModel({
-    required this.size,
-    required this.i,
-    required this.j,
+  Future removeFiredColorFromQueue(int index) async{
+    firedBubbleColor.removeAt(index);
+    moves = moves - 1;
+    if(moves==0){
+      gameOver=true;
+    }
+    notifyListeners();
+  }
+  setTarget(int y, int x) {
+    this.targetY = y;
+    this.targetX = x;
+    notifyListeners();
+  }
+  setScorer(int _scorer){
+    this.currentScorer=this.currentScorer+_scorer;
+    if(currentScorerPercentage<=100.0){
+      currentScorerPercentage=currentScorer/levelTargetScorer;
+      currentScorerPercentage=currentScorerPercentage*100;
+      if(currentScorerPercentage>100.0){
+        currentScorerPercentage =100.0;
+        print(currentScorerPercentage);
+      }
+    }
+    notifyListeners();
+  }
 
-    required this.bubbleColor,
-    required this.isVisible
-  }){
-   setSurroundings();
-   setPosition();
+  setOldScorer(){
+    this.oldScorer=currentScorer;
+    this.oldScorerPercentage=currentScorerPercentage;
+    notifyListeners();
   }
-  void setPosition(){
-    double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
-    double initialTop = 0;
-    top = initialTop  + (ballWidth -2) * i;
-    left = 1 +(ballWidth+1)*j;
-    if(i % 2 != 0){
-      left = left + ballWidth /2;
+  assignColorToFiredBubbleColor() {
+    firedBubbleColor = [];
+    for (int i = 0; i < moves; i++) {
+      var rng = new Random();
+      int rand = rng.nextInt(bubbleColorInLevel);
+
+      firedBubbleColor.add(bubbleColors[rand]);
     }
+    // notifyListeners();
   }
-  void setSurroundings(){
-    bubbleCoordinate = Offset(i.toDouble(), j.toDouble());
-    Set<List<int>> surroundinCords = {};
-    Set<Offset> finalCords = {};
-    surroundinCords.add([i,j-1]);
-    surroundinCords.add([i,j+1]);
-    bool is11 = i & 2 ==0;
-    if(is11){
-      surroundinCords.add([i-1,j-1]);
-      surroundinCords.add([i-1,j]);
-      surroundinCords.add([i+1,j-1]);
-      surroundinCords.add([i+1,j]);
-    }
-    else{
-      surroundinCords.add([i-1,j]);
-      surroundinCords.add([i-1,j+1]);
-      surroundinCords.add([i+1,j]);
-      surroundinCords.add([i+1,j+1]);
-    }
-    for(int a =0;a<surroundinCords.length;a++){
-      final current = surroundinCords.elementAt(a);
-      if(current.first >= 0 && current.first < 40){
-        bool is11 = current.first % 2 ==0;
-        if(is11 && current.last >= 0 && current.last < 11){
-          finalCords.add(Offset(current.first.toDouble(),current.last.toDouble()));
+  Future firedFunction(int targetX,int targetY) async {
+    try{
+      int y = targetY;
+      int x = targetX;
+
+      int newScore =0;
+      int defaultScorerForSingleBubble =10;
+      Color newBubbleColor = firedBubbleColor[0];
+      removeCoordinatedMain.clear();
+      fallingNodesMain = Set();
+      setOldScorer();
+
+
+
+      if (y != -1 && x != -1) {
+        assignNewValueToBubbleClass(
+            y, x, newBubbleColor, true); // set new Color to define node
+        Set<Offset> removedOffsetList =Set();
+        Set<Offset> alreadyCheckedRemoved =Set();
+        removedOffsetList.clear();
+        removedOffsetList.add(Offset(x.toDouble(),y.toDouble()));
+        alreadyCheckedRemoved.add(Offset(x.toDouble(),y.toDouble()));
+
+        for(Offset a in bubbles[y][x].surroundingCoordinate ){
+          int newY =a.dy.toInt();
+          int newX =a.dx.toInt();
+          if(a.dy>=fakeTop  && bubbles[newY][newX].bubbleColor==newBubbleColor){
+            removedOffsetList.add(a);
+
+          }
         }
-        else if(current.last >= 0 && current.last < 10){
-          finalCords.add(Offset(current.first.toDouble(),current.last.toDouble()));
+
+        do {
+          for (int b = 0; b < removedOffsetList.length; b++) {
+            int Y1 = removedOffsetList.elementAt(b).dy.toInt();
+            int X1 = removedOffsetList.elementAt(b).dx.toInt();
+            Offset currrentOffset = bubbles[Y1][X1].bubbleCoordinate;
+            if(alreadyCheckedRemoved.contains(currrentOffset) == false  &&Y1 >= fakeTop){
+
+
+              for (int c = 0; c < bubbles[Y1][X1].surroundingCoordinate.length;c++) {
+                Offset addNew =
+                bubbles[Y1][X1].surroundingCoordinate.elementAt(c);
+                int checkY1 = addNew.dy.toInt();
+                int checkX1 = addNew.dx.toInt();
+                if (bubbles[checkY1][checkX1].bubbleColor == newBubbleColor) {
+                  removedOffsetList.add(addNew);
+                }
+
+              }
+              defaultScorerForSingleBubble = defaultScorerForSingleBubble + fixedIncreasement;
+              newScore = newScore + defaultScorerForSingleBubble;
+            }
+            alreadyCheckedRemoved.add(removedOffsetList.elementAt(b));
+            assignNewValueToBubbleClass(Y1, X1, Colors.transparent, false);
+
+            // Timer(Duration(milliseconds: 100), () {
+            //   assignNewValueToBubbleClass(Y1, X1, Colors.transparent, true);
+            // });
+            removedOffsetList.remove(removedOffsetList.elementAt(b));
+          }
+        } while (removedOffsetList.length != 0);
+
+        notifyListeners();
+        if(removedOffsetList.length==0){
+          calculateFalling();
+        }
+
+        setScorer(newScore);
+      }
+    }
+    catch(e){
+      print("error at =firefuction");
+      print(e.toString());
+    }
+  }
+
+  calculateFalling() {
+    final Set<Offset> checkedNode = Set();
+    final Set<Offset> mustCheckedList = Set();
+    fallingNodesMain = Set();
+
+    for (int j = 0; j < bubbles[fakeTop].length; j++) {
+      if (bubbleColors.contains(bubbles[fakeTop][j].bubbleColor)) {
+        int rowY = bubbles[fakeTop][j].i.toInt();
+        int rowX = bubbles[fakeTop][j].j.toInt();
+        Offset addCheckOffset =bubbles[rowY][rowX].bubbleCoordinate;
+        checkedNode.add(addCheckOffset);
+
+ for (Offset k in bubbles[fakeTop][j].surroundingCoordinate) {
+          int surroundingY = k.dy.toInt();
+          int surroundingX = k.dx.toInt();
+       //   print(surroundingY);
+          if (surroundingY >= fakeTop &&checkedNode.contains(k)==false) {
+            //Offset(surroundingX.toDouble(), surroundingY.toDouble()
+
+mustCheckedList.add(k);
+          }
         }
       }
     }
-    surroundingCoordinate = finalCords;
+
+
+
+
+
+    do {
+      int mustLength = mustCheckedList.length;
+      for (int i = 0; i < mustLength; i++) {
+        print(checkedNode.contains(mustCheckedList.elementAt(0)) );
+        if (checkedNode.contains(mustCheckedList.elementAt(0)) == false) {
+
+          int mustY = mustCheckedList.elementAt(0).dy.toInt();
+          int mustX = mustCheckedList.elementAt(0).dx.toInt();
+
+          bool isTopRowBubble = mustY == 0 ? true : false;
+          if ( mustY >= fakeTop) {
+            if (bubbleColors.contains(bubbles[mustY][mustX].bubbleColor)) {
+
+                List<bool> supportedAboveNodes =
+                []; // true // node has support from above nodes false //vice versa
+                for (int b = 0; b <bubbles[mustY][mustX].surroundingCoordinate.length ; b++) {
+                  int aboveY =
+                  bubbles[mustY][mustX].surroundingCoordinate.elementAt(b).dy.toInt();
+                  int aboveX =
+                  bubbles[mustY][mustX].surroundingCoordinate.elementAt(b).dx.toInt();
+                  if (aboveY != -1 && aboveX != -1 && aboveY >= fakeTop) {
+                    if (bubbles[aboveY][aboveX].bubbleColor == BubbleColor0) {
+                      // means node is empty bubbleColor0 = transparent
+                      supportedAboveNodes.add(false);
+                    } else {
+                      supportedAboveNodes.add(true);
+                    }
+                  }
+                }
+
+                // out b for loop
+                if (supportedAboveNodes.contains(true)) {
+                  for (int a = 0; a < bubbles[mustY][mustX].surroundingCoordinate.length; a++) {
+                    int addY =
+                    bubbles[mustY][mustX].surroundingCoordinate.elementAt(a).dy.toInt();
+                    int addX =
+                    bubbles[mustY][mustX].surroundingCoordinate.elementAt(a).dx.toInt();
+                    Offset addOffest = Offset(addX.toDouble(), addY.toDouble());
+                    if (checkedNode.contains(addOffest) == false) {
+                      mustCheckedList.add(addOffest);
+                    }
+                  }
+                  checkedNode.add(mustCheckedList.elementAt(0));
+               }
+             // }
+            }
+          }
+        }
+
+
+
+        mustCheckedList.remove(mustCheckedList.elementAt(0));
+        mustLength = mustCheckedList.length;
+      }
+    } while (mustCheckedList.length != 0);
+
+
+// check is node check or not
+    for (int a = 0; a < bubbles.length; a++) {
+      for (int b = 0; b < bubbles[a].length; b++) {
+        Color currentColor =bubbles[a][b].bubbleColor;
+        if (bubbleColors.contains(currentColor)) {
+          int offsetY = bubbles[a][b].i.toInt();
+          int offsetX = bubbles[a][b].j.toInt();
+          Offset guessOffset = Offset(offsetX.toDouble(), offsetY.toDouble());
+
+          if (checkedNode.contains(guessOffset) == false) {
+            bubbles[a][b].bubbleColor = temporaryFalingColor;
+            //fallingNodesMain.add(guessOffset);
+          }
+        }
+      }
+    }
+
+   // setTarget(-1, -1);
+    removeEmptyRow();
+    // fallAndRemoveMethod();
+    //function over
   }
 
+  removeEmptyRow()async{
+    List<List<BubbleModel>> removeRow =[];
+    for(List<BubbleModel> a in bubbles){
+      List<bool> isBubbleEmpty =[];
+      for(BubbleModel b in a){
+        if(bubbleColors.contains(b.bubbleColor) && b.bubbleColor!=temporaryFalingColor){
+          isBubbleEmpty.add(false);
+        }else{
+          isBubbleEmpty.add(true);
+        }
+      }
+      if(!isBubbleEmpty.contains(false)){
+        removeRow.add(a);
+      }
+    }
+    print(removeRow);
+    bubbles.removeWhere( (e) => removeRow.contains(e));
+    notifyListeners();
+  }
+   assignNewValueToBubbleClass(int y, int x, Color newColor, bool visible)
+   {
+     bubbles[y][x].bubbleColor =newColor;
+     bubbles[y][x].isVisible =visible;
+     notifyListeners();
+  }
+
+
 }
+
