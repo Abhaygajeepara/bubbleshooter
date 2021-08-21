@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:bubble/widgets/GameScreen/SubWidget/GameScreen.dart';
+import 'package:bubble/widgets/Home/HomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
@@ -7,6 +11,7 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> with TickerProviderStateMixin {
+  bool isSplash = true;
   late AnimationController _animationController;
   late Animation _animation;
   late AnimationController _animationController2;
@@ -20,69 +25,80 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
   @override
   void initState() {
     // TODO: implement initState
-    _animationController = AnimationController(
-        duration: Duration(milliseconds: 1000), vsync: this);
-    _animation = Tween(begin: 1.0, end: -0.01).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.ease))
-      ..addListener(() {
-        if (_animation.isCompleted) {
-          _animationController.reverse();
-          _animationController2.forward();
-        }
-        setState(() {});
+    Future.delayed(const Duration(seconds: 5), () {
+      setState(() {
+     isSplash=false;
       });
 
-    _animationController2 =
-        AnimationController(duration: Duration(seconds: 1), vsync: this);
-    _animation2 = Tween(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _animationController2, curve: Curves.ease))
-      ..addListener(() {
-        if (_animation2.isCompleted) {
-          isVertical = true;
+    });
+    super.initState();
+  }
+animationFunction (){
+  _animationController = AnimationController(
+      duration: Duration(seconds: 3), vsync: this);
+  _animation = Tween(begin: 1.0, end: -0.01).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.ease))
+    ..addListener(() {
+      if (_animation.isCompleted) {
+        _animationController.reverse();
+        _animationController2.forward();
+      }
+      setState(() {});
+    });
 
-          _animationController3.forward();
-        }
-        setState(() {
+  _animationController2 =
+      AnimationController(duration: Duration(seconds: 1), vsync: this);
+  _animation2 = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController2, curve: Curves.ease))
+    ..addListener(() {
+      if (_animation2.isCompleted) {
+        isVertical = true;
 
-        });
+        _animationController3.forward();
+      }
+      setState(() {
+
       });
-    // rotateController =
-    //     AnimationController(duration: Duration(milliseconds: 500), vsync: this);
-    // rotateAnimation = Tween(begin: 0.0, end: 1.55).animate(
-    //     CurvedAnimation(parent: rotateController, curve: Curves.ease))
-    //   ..addListener(() {
-    //     setState(() {
-    //
-    //     });
-    //   });
-    _animationController3 =
-        AnimationController(duration: Duration(seconds: 2), vsync: this);
-    _animation3 = Tween(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _animationController3, curve: Curves.ease))
-      ..addListener(() {
-        setState(() {
+    });
+  // rotateController =
+  //     AnimationController(duration: Duration(milliseconds: 500), vsync: this);
+  // rotateAnimation = Tween(begin: 0.0, end: 1.55).animate(
+  //     CurvedAnimation(parent: rotateController, curve: Curves.ease))
+  //   ..addListener(() {
+  //     setState(() {
+  //
+  //     });
+  //   });
+  _animationController3 =
+      AnimationController(duration: Duration(seconds: 2), vsync: this);
+  _animation3 = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController3, curve: Curves.ease))
+    ..addListener(() {
+      setState(() {
 
-        });
       });
+    });
 
 
   _animationController.forward();
-    super.initState();
-  }
-
+}
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(child: bottomShotter()),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _animationController.reset();
-            _animationController.forward();
-          });
-        },
+    return !isSplash? GameScreen():Scaffold(
+
+     // body: Center(child: bottomShotter()),
+      body:Center(
+        child: Image.asset('assets/BubbleShotter.png'),
       ),
+
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     setState(() {
+      //       _animationController.reset();
+      //       _animationController.forward();
+      //     });
+      //   },
+      // ),
     );
   }
 

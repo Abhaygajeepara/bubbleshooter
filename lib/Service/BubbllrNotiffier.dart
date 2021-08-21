@@ -16,7 +16,7 @@ Color temporaryFalingColor =Colors.white;
 
   ///level
   int currentLevel =1;
-  int maxRaw = 10;
+  int maxRaw = 5;
   List<List<BubbleModel>> bubbles = [];
   bool isInitialized = false;
   List<Color> bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3];
@@ -49,7 +49,7 @@ Color temporaryFalingColor =Colors.white;
   BubbleNotifier(){
     setLevelTarget(){
       levelTargetScorer=  (fixScorer*currentLevel)+fixNextTarget;
-      print('levelTargetScorer='+levelTargetScorer.toString());
+   //   print('levelTargetScorer='+levelTargetScorer.toString());
       notifyListeners();
     }
   }
@@ -65,7 +65,7 @@ Color temporaryFalingColor =Colors.white;
           var rng = new Random();
           int random = rng.nextInt(bubbleColorInLevel);
           bubbleColor = bubbleColors[random];
-          raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true,maxRaw: maxRaw));
+          raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true,maxRaw: maxRaw,isRender: false));
         }
         bubbles.add(raw);
       }
@@ -92,7 +92,7 @@ Color temporaryFalingColor =Colors.white;
       currentScorerPercentage=currentScorerPercentage*100;
       if(currentScorerPercentage>100.0){
         currentScorerPercentage =100.0;
-        print(currentScorerPercentage);
+       // print(currentScorerPercentage);
       }
     }
     notifyListeners();
@@ -113,8 +113,8 @@ Color temporaryFalingColor =Colors.white;
     }
     // notifyListeners();
   }
-  Future firedFunction(int targetX,int targetY) async {
-    try{
+  Future firedFunction() async {
+
       int y = targetY;
       int x = targetX;
 
@@ -127,7 +127,7 @@ Color temporaryFalingColor =Colors.white;
 
 
 
-      if (y != -1 && x != -1) {
+      if (y>=fakeTop) {
         assignNewValueToBubbleClass(
             y, x, newBubbleColor, true); // set new Color to define node
         Set<Offset> removedOffsetList =Set();
@@ -158,7 +158,7 @@ Color temporaryFalingColor =Colors.white;
                 bubbles[Y1][X1].surroundingCoordinate.elementAt(c);
                 int checkY1 = addNew.dy.toInt();
                 int checkX1 = addNew.dx.toInt();
-                if (bubbles[checkY1][checkX1].bubbleColor == newBubbleColor) {
+                if (bubbles[checkY1][checkX1].bubbleColor == newBubbleColor && checkY1>=fakeTop) {
                   removedOffsetList.add(addNew);
                 }
 
@@ -176,18 +176,16 @@ Color temporaryFalingColor =Colors.white;
           }
         } while (removedOffsetList.length != 0);
 
-        notifyListeners();
+
         if(removedOffsetList.length==0){
           calculateFalling();
         }
 
-        setScorer(newScore);
+       setScorer(newScore);
+        notifyListeners();
+
       }
-    }
-    catch(e){
-      print("error at =firefuction");
-      print(e.toString());
-    }
+
   }
 
   calculateFalling() {
@@ -222,15 +220,16 @@ mustCheckedList.add(k);
     do {
       int mustLength = mustCheckedList.length;
       for (int i = 0; i < mustLength; i++) {
-        print(checkedNode.contains(mustCheckedList.elementAt(0)) );
-        if (checkedNode.contains(mustCheckedList.elementAt(0)) == false) {
+     //   print(checkedNode.contains(mustCheckedList.elementAt(0)) );
+        int _y1=mustCheckedList.elementAt(0).dy.toInt();
+        if (checkedNode.contains(mustCheckedList.elementAt(0)) == false && _y1>= fakeTop) {
 
           int mustY = mustCheckedList.elementAt(0).dy.toInt();
           int mustX = mustCheckedList.elementAt(0).dx.toInt();
 
-          bool isTopRowBubble = mustY == 0 ? true : false;
-          if ( mustY >= fakeTop) {
-            if (bubbleColors.contains(bubbles[mustY][mustX].bubbleColor)) {
+
+
+            if ( mustY >= fakeTop&& bubbleColors.contains(bubbles[mustY][mustX].bubbleColor)) {
 
                 List<bool> supportedAboveNodes =
                 []; // true // node has support from above nodes false //vice versa
@@ -239,7 +238,7 @@ mustCheckedList.add(k);
                   bubbles[mustY][mustX].surroundingCoordinate.elementAt(b).dy.toInt();
                   int aboveX =
                   bubbles[mustY][mustX].surroundingCoordinate.elementAt(b).dx.toInt();
-                  if (aboveY != -1 && aboveX != -1 && aboveY >= fakeTop) {
+                  if ( aboveY >= fakeTop) {
                     if (bubbles[aboveY][aboveX].bubbleColor == BubbleColor0) {
                       // means node is empty bubbleColor0 = transparent
                       supportedAboveNodes.add(false);
@@ -265,7 +264,7 @@ mustCheckedList.add(k);
                }
              // }
             }
-          }
+
         }
 
 
@@ -277,7 +276,7 @@ mustCheckedList.add(k);
 
 
 // check is node check or not
-    for (int a = 0; a < bubbles.length; a++) {
+    for (int a = fakeTop; a < bubbles.length; a++) {
       for (int b = 0; b < bubbles[a].length; b++) {
         Color currentColor =bubbles[a][b].bubbleColor;
         if (bubbleColors.contains(currentColor)) {
@@ -287,6 +286,8 @@ mustCheckedList.add(k);
 
           if (checkedNode.contains(guessOffset) == false) {
             bubbles[a][b].bubbleColor = temporaryFalingColor;
+            bubbles[a][b].isRender = true;
+
             //fallingNodesMain.add(guessOffset);
           }
         }
@@ -294,16 +295,17 @@ mustCheckedList.add(k);
     }
 
    // setTarget(-1, -1);
-    removeEmptyRow();
+   removeEmptyRow();
     // fallAndRemoveMethod();
     //function over
   }
 
   removeEmptyRow()async{
     List<List<BubbleModel>> removeRow =[];
-    for(List<BubbleModel> a in bubbles){
+    for(int a=fakeTop;a<bubbles.length;a++){
       List<bool> isBubbleEmpty =[];
-      for(BubbleModel b in a){
+      for(int n=0;n<bubbles[a].length;n++){
+        BubbleModel b = bubbles[a][n];
         if(bubbleColors.contains(b.bubbleColor) && b.bubbleColor!=temporaryFalingColor){
           isBubbleEmpty.add(false);
         }else{
@@ -311,12 +313,24 @@ mustCheckedList.add(k);
         }
       }
       if(!isBubbleEmpty.contains(false)){
-        removeRow.add(a);
+        if(fakeTop>1){
+          fakeTop =fakeTop-1;
+          min(fakeTop, 0);
+
+        }else{
+          fakeTop=0;
+        }
+        removeRow.add(bubbles[a]);
       }
     }
-    print(removeRow);
-    bubbles.removeWhere( (e) => removeRow.contains(e));
-    notifyListeners();
+ //   print(fakeTop);
+    if(removeRow.length>0){
+      removeRow.remove(removeRow.first);
+      bubbles.removeWhere( (e) => removeRow.contains(e));
+      notifyListeners();
+    }
+
+
   }
    assignNewValueToBubbleClass(int y, int x, Color newColor, bool visible)
    {

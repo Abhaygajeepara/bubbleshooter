@@ -10,22 +10,27 @@ class BubbleModel{
   bool isVisible;
   Size size;
   int  maxRaw;
+  bool isRender =false;
   BubbleModel({
     required this.size,
     required this.i,
     required this.j,
     required this.bubbleColor,
     required this.isVisible,
-    required this.maxRaw
+    required this.maxRaw,
+    required this.isRender,
   }){
     setSurroundings();
     setPosition();
   }
   void setPosition(){
     double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
-    double initialTop = 0;
+    //double initialTop = 0;
+    double initialTop = size.width/21;
     top = initialTop  + (ballWidth -2) * i;
-    left = 1 +(ballWidth+1)*j;
+    //left = 1 +(ballWidth+1)*j;
+    double half =(size.width/11)/2;
+    left = half+1 +(ballWidth+1)*j;
     if(i % 2 != 0){
       left = left + ballWidth /2;
     }

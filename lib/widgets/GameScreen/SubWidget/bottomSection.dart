@@ -11,61 +11,55 @@ import 'dart:math' as math;
 
 class BottomSection extends StatefulHookWidget {
   const BottomSection();
+
   @override
   _BotomSectionState createState() => _BotomSectionState();
 }
 
 class _BotomSectionState extends State<BottomSection> {
-  double x = 0,y =0;
-  double bx =0,by =0;
+  double x = 0, y = 0;
+  double bx = 0, by = 0;
   double dy = 0;
-  double  m = 0;
+  double m = 0;
   double dx = 0;
+
   @override
   Widget build(BuildContext context) {
-   //final bubbleData= useProvider(bubbleProvider);
-   final bubbleData= useProvider(jBubbleProvider);
-   final lineData = context.read(lineProvider);
+    //final bubbleData= useProvider(bubbleProvider);
+    final bubbleData = useProvider(jBubbleProvider);
+    final lineData = context.read(lineProvider);
     final size = MediaQuery.of(context).size;
-    bx = size.width /2;
-    by = size.height  * .15;
+    bx = size.width / 2;
+    by = size.height * .15;
 
     return GestureDetector(
-      onPanEnd: (val){
+      onPanEnd: (val) {
         print("pan end");
       },
-      onPanDown: (val){
+      onPanDown: (val) {
         x = val.localPosition.dx;
         y = val.localPosition.dy;
         // print('x='+x.toString()+"//"+"y=" +y.toString());
       },
-      onPanUpdate: (val){
+      onPanUpdate: (val) {
         x = val.localPosition.dx;
         y = val.localPosition.dy;
         // if(x == bx){
         //   x = x-1;
         // }
         // m =(y - by)/(x- bx);
-        m = (y - by)/(x-bx);
+        m = (y - by) / (x - bx);
         lineData.calculate(bx, by, x, y, size);
-        if(x < bx){
+        if (x < bx) {
           dx = 0;
-        }
-        else{
+        } else {
           dx = size.width;
         }
-       // print(m);
-        // if(x < size.width){
-        //   m = m * -1;
-        // }
-         dy = m * (dx-bx) + by;
-        double ang = math.atan(m ) * 180/3.14 ;
-        // print(ang.toString() +"andle");
-        setState(() {
 
-        });
-        // print("on upfdate" + x.toString()+"///"+y.toString());
-        // print("bx"+bx.toString()+"by"+by.toString()+"dx"+dx.toString()+"dy"+dy.toString());
+        dy = m * (dx - bx) + by;
+        double ang = math.atan(m) * 180 / 3.14;
+
+        setState(() {});
       },
       child: Container(
           height: size.height * 0.3,
@@ -73,12 +67,10 @@ class _BotomSectionState extends State<BottomSection> {
           // color: bottomBarBgColor,
           color: Colors.black,
           child: Stack(
-
             children: [
               LineWidget(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                 children: [
                   //firedBubbleQueue(bubbleData),
                   // Text( "y="+bubbleData.targetY.toString()+"   "+"x="+bubbleData.targetY.toString(),
@@ -90,38 +82,39 @@ class _BotomSectionState extends State<BottomSection> {
                   // ),
                   bubbleData.firedBubbleColor.length <= 0
                       ? Container()
-                      : FiredBubble(bubbleColor:bubbleData.firedBubbleColor[0]),
-                  ElevatedButton(onPressed: ()async{
-                    if(bubbleData.firedBubbleColor.length!=0){
-                     await  bubbleData.firedFunction(5,5);
-                   // print(bubbleData.bubbles[5][5].surroundingCoordinate);
-                     // await    bubbleData.removeFiredColorFromQueue(0);
-                      //await bubbleData.fallAndRemoveMethod();
-                      //  await bubbleData.removeRow();
-                    }else{
-                      showDialog(context: context,
-                          builder: (context){
-                            return AlertDialog(
-
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('kal aa na'),
-
-                                  ElevatedButton(onPressed: (){
-                                    // bubbleData.setDefaultData();
-                                    // bubbleData.assignColorToFiredBubbleColor();
-                                    Navigator.pop(context);
-
-                                  }, child: Text('restart'))
-                                ],
-                              ),
-                            );
-                          }
-
-                      );
-                    }
-                  }, child: Text('Fire'))
+                      : FiredBubble(
+                          bubbleColor: bubbleData.firedBubbleColor[0]),
+                  ElevatedButton(
+                      onPressed: () async {
+                        if (bubbleData.firedBubbleColor.length != 0) {
+                          await bubbleData.firedFunction();
+                          // print(bubbleData.bubbles[5][5].surroundingCoordinate);
+                          await bubbleData.removeFiredColorFromQueue(0);
+                          //await bubbleData.fallAndRemoveMethod();
+                          //  await bubbleData.removeRow();
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('kal aa na'),
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            // bubbleData.setDefaultData();
+                                            // bubbleData.assignColorToFiredBubbleColor();
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('restart'))
+                                    ],
+                                  ),
+                                );
+                              });
+                        }
+                      },
+                      child: Text('Fire'))
                 ],
               ),
             ],
@@ -129,10 +122,11 @@ class _BotomSectionState extends State<BottomSection> {
     );
   }
 }
+
 class LineWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final size  = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     final lineData = useProvider(lineProvider);
     // print(lineData.lines[0].toString());
     return CustomPaint(
@@ -144,34 +138,36 @@ class LineWidget extends HookWidget {
     );
   }
 }
-class LineDrawer extends CustomPainter{
+
+class LineDrawer extends CustomPainter {
   List<Line> lines;
-  LineDrawer ({required this.lines});
+
+  LineDrawer({required this.lines});
+
   @override
   void paint(Canvas canvas, Size size) {
-  if(lines.isNotEmpty){
-    canvas.translate(lines[0].start.dx, lines[0].start.dy);
-    // print((size.width/2).toString()+"width"+(size.height).toString()+"height");
-    Paint p = Paint();
-    p..color = Colors.red
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    // canvas.drawLine(Offset.zero, lines[0].end, p);
-    // canvas.translate(lines[0].end.dx,lines[0].end.dy);
-    // canvas.drawLine(Offset.zero, Offset(100,100), p);
-    for(int i =0;i<lines.length;i++) {
-      canvas.drawLine(Offset.zero, lines[i].end, p);
-      canvas.translate(lines[i].end.dx,lines[i].end.dy);
+    if (lines.isNotEmpty) {
+      canvas.translate(lines[0].start.dx, lines[0].start.dy);
+      // print((size.width/2).toString()+"width"+(size.height).toString()+"height");
+      Paint p = Paint();
+      p
+        ..color = Colors.red
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
+      // canvas.drawLine(Offset.zero, lines[0].end, p);
+      // canvas.translate(lines[0].end.dx,lines[0].end.dy);
+      // canvas.drawLine(Offset.zero, Offset(100,100), p);
+      for (int i = 0; i < lines.length; i++) {
+        canvas.drawLine(Offset.zero, lines[i].end, p);
+        canvas.translate(lines[i].end.dx, lines[i].end.dy);
+      }
     }
-
-  }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-   return true;
+    return true;
   }
-
 }
 //
 // class LineDrawer extends CustomPainter{

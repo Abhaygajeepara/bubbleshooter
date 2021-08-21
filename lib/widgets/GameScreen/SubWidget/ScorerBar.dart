@@ -40,17 +40,17 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
   applyAnimation(BubbleNotifier provider ){
 
       percentageAnimation=Tween(begin: provider.oldScorerPercentage,end: provider.currentScorerPercentage).animate(CurvedAnimation(parent: percentageController, curve: Curves.ease))..addListener(() {
-        setState(() {});
+
       });
 
 
 
     scorerAnimation=IntTween(begin: provider.oldScorer,end: provider.currentScorer).animate(CurvedAnimation(parent: scorerController, curve: Curves.ease))..addListener(() {
-      setState(() {});
+
     });
 
       valueAnimation =IntTween(begin: provider.moves,end: provider.moves-1).animate(CurvedAnimation(parent: scorerController, curve: Curves.ease))..addListener(() {
-        setState(() {});
+
       });
       if(provider.moves!=0){
         valueController.forward();
@@ -70,8 +70,6 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
 
 
       //  print('forward');
-    }else{
-      // print('stop');
     }
     scorer =provider.currentScorer;
   }
@@ -92,59 +90,64 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
 
           children: [
            
-            Material(
-              elevation: 10,
-              //color: scorerBoxColor,
+            AnimatedBuilder(
+              animation: percentageController,
+              builder: (context, snapshot) {
+                return Material(
+                  elevation: 10,
+                  //color: scorerBoxColor,
           borderRadius: borderRadius,
-              child: Container(
-                height: size.height*0.03,
-                width: size.width*0.6,
-                decoration: BoxDecoration(
-                    color: scorerBoxColor,
-                  border: Border.all(
-                  //  color: Colors.black
+                  child: Container(
+                    height: size.height*0.03,
+                    width: size.width*0.6,
+                    decoration: BoxDecoration(
+                        color: scorerBoxColor,
+                      border: Border.all(
+                      //  color: Colors.black
+                      ),
+                      borderRadius: borderRadius,
+                    ),
+                    child: Stack(
+                      children: [
+
+                        Container(
+
+
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: borderRadius,
+                          ),
+                        ),
+                        percentageAnimation.value!=0? Container(
+                         // constraints: BoxConstraints(minWidth: 0, maxWidth:  0),
+                          height: size.height*0.03,
+                          width:   (size.width*0.006*percentageAnimation.value),
+
+                          decoration: BoxDecoration(
+                            borderRadius: borderRadius,
+                             gradient: LinearGradient(colors: [
+                               progress1,
+                               progress2,
+                               progress3,
+                             ]),
+                           // borderRadius: BorderRadius.horizontal(right: Radius.circular( percentageAnimation.value>98.0?0: 20.0))
+                          ),
+                        ):Container(),
+                        Center(child: Text(
+                            scorerAnimation.value.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: size.width*0.04,
+                            color: scorerTextColor
+                          ),
+
+                        )),
+
+                      ],
+                    ),
                   ),
-                  borderRadius: borderRadius,
-                ),
-                child: Stack(
-                  children: [
-
-                    Container(
-
-
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: borderRadius,
-                      ),
-                    ),
-                    Container(
-                     // constraints: BoxConstraints(minWidth: 0, maxWidth:  0),
-                      height: size.height*0.03,
-                      width:  percentageAnimation.value!=0? (size.width*0.006*percentageAnimation.value):10,
-
-                      decoration: BoxDecoration(
-                        borderRadius: borderRadius,
-                         gradient: LinearGradient(colors: [
-                           progress1,
-                           progress2,
-                           progress3,
-                         ]),
-                       // borderRadius: BorderRadius.horizontal(right: Radius.circular( percentageAnimation.value>98.0?0: 20.0))
-                      ),
-                    ),
-                    Center(child: Text(
-                        scorerAnimation.value.toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: size.width*0.04,
-                        color: scorerTextColor
-                      ),
-
-                    )),
-
-                  ],
-                ),
-              ),
+                );
+              }
             ),
 
             AnimatedBuilder(

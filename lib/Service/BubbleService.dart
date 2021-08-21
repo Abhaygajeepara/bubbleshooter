@@ -29,7 +29,7 @@ class BubbleService extends ChangeNotifier {
   List<Color> firedBubbleColor = [];
 
   // moves
-  int moves = 10;
+  int moves = 15;
 
   // level info
   int bubbleColorInLevel = 2;

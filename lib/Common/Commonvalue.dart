@@ -6,6 +6,7 @@ const MaterialColor BubbleColor1  = Colors.red ;
 const MaterialColor BubbleColor2  = Colors.blue ;
 const MaterialColor BubbleColor3  = Colors.green ;
 //scorer bar
+const themeColor =Colors.blueGrey;
 const scorerBarColor =Colors.blueGrey;
 const scorerBoxColor =Colors.white;
 const progress1=Colors.lightBlueAccent;
@@ -23,3 +24,10 @@ const bottomBarBgColor =Colors.transparent;
 // bubble values
 const int numberOfBubbleInRow = 11;
 const int totalPaddingInRow = 14;
+
+// homeScreen
+const settingButtonColor =Colors.white;
+const settingButtonBackground =Color(0xffd60000);
+
+// image path
+const settingImage = 'assets/svg/settings.svg';

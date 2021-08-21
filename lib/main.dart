@@ -1,7 +1,10 @@
+import 'package:bubble/Common/Commonvalue.dart';
 import 'package:bubble/Model/Bubble.dart';
 import 'package:bubble/Service/BubbleService.dart';
 import 'package:bubble/Service/BubbllrNotiffier.dart';
+import 'package:bubble/widgets/Home/HomeScreen.dart';
 import 'package:bubble/widgets/SplashScreen/splash.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'widgets/GameScreen/SubWidget/GameScreen.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +26,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     // TODO: implement initState
+    SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
 
   }
@@ -31,9 +35,14 @@ class _MyAppState extends State<MyApp> {
 
    // context.read(bubbleProvider).setDefaultData();
    //  context.read(bubbleProvider).assignColorToFiredBubbleColor();
+
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
+        primaryColor: themeColor,
+        backgroundColor: themeColor,
+        scaffoldBackgroundColor:themeColor ,
         primarySwatch: Colors.blue,
       ),
       home: FakeSlpash(),
@@ -51,7 +60,8 @@ class _FakeSlpashState extends State<FakeSlpash> {
     final size =MediaQuery.of(context).size;
     context.read(jBubbleProvider).assignColorToFiredBubbleColor();
     context.read(jBubbleProvider).init(size);
-    return GameScreen();
+
+    return HomeScreen();
   }
 }
 
