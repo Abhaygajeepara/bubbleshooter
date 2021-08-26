@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class BubbleModel{
   Color bubbleColor;
-  late double left,top;
+  late double left;
+  //late double top;
   int  i,j;
   late Offset bubbleCoordinate;
   late Set<Offset> surroundingCoordinate;
@@ -26,8 +27,8 @@ class BubbleModel{
   void setPosition(){
     double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
     //double initialTop = 0;
-    double initialTop = size.width/21;
-    top = initialTop  + (ballWidth -2) * i;
+   // double initialTop = size.width/21;
+   // top = initialTop  + (ballWidth -2) * i;
     //left = 1 +(ballWidth+1)*j;
     double half =(size.width/11)/2;
     left = half+1 +(ballWidth+1)*j;

@@ -15,6 +15,7 @@ void main() {
 
 }
 final bubbleProvider = ChangeNotifierProvider((ref)=>BubbleService());
+final jBubbleProvider = ChangeNotifierProvider<BubbleNotifier>((_ref)=>BubbleNotifier());
 class MyApp extends StatefulWidget {
   // This widget is the root of your application.
   @override
@@ -40,10 +41,10 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: themeColor,
-        backgroundColor: themeColor,
-        scaffoldBackgroundColor:themeColor ,
-        primarySwatch: Colors.blue,
+        // primaryColor: themeColor,
+        // backgroundColor: themeColor,
+        // scaffoldBackgroundColor:themeColor ,
+        // primarySwatch: Colors.blue,
       ),
       home: FakeSlpash(),
     );
@@ -60,7 +61,7 @@ class _FakeSlpashState extends State<FakeSlpash> {
     final size =MediaQuery.of(context).size;
     context.read(jBubbleProvider).assignColorToFiredBubbleColor();
     context.read(jBubbleProvider).init(size);
-
+   return GameScreen();
     return HomeScreen();
   }
 }

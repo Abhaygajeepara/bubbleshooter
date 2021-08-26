@@ -8,7 +8,7 @@ import 'package:bubble/Model/BubbleModel.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final jBubbleProvider = ChangeNotifierProvider<BubbleNotifier>((_ref)=>BubbleNotifier());
+
 class BubbleNotifier extends ChangeNotifier{
 //temporary Variable
 Color temporaryFalingColor =Colors.white;
@@ -16,7 +16,7 @@ Color temporaryFalingColor =Colors.white;
 
   ///level
   int currentLevel =1;
-  int maxRaw = 5;
+  int maxRaw = 25;
   List<List<BubbleModel>> bubbles = [];
   bool isInitialized = false;
   List<Color> bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3];
@@ -24,7 +24,7 @@ Color temporaryFalingColor =Colors.white;
   // fire
 
   List<Color> firedBubbleColor = [];
-  int fakeTop = 0;
+  int fakeTop = 10;
 
   int targetY = -1;
   int targetX = -1;
@@ -50,7 +50,7 @@ Color temporaryFalingColor =Colors.white;
     setLevelTarget(){
       levelTargetScorer=  (fixScorer*currentLevel)+fixNextTarget;
    //   print('levelTargetScorer='+levelTargetScorer.toString());
-      notifyListeners();
+    //  notifyListeners();
     }
   }
   //BubbleNotifier();
@@ -78,12 +78,20 @@ Color temporaryFalingColor =Colors.white;
     if(moves==0){
       gameOver=true;
     }
-    notifyListeners();
+ //   notifyListeners();
+  }
+  Future swapFireBubble()async{
+    if(firedBubbleColor.length>=2){
+      Color first =firedBubbleColor.first;
+      firedBubbleColor.removeAt(0);
+      firedBubbleColor.insert(1,first);
+      notifyListeners();
+    }
   }
   setTarget(int y, int x) {
     this.targetY = y;
     this.targetX = x;
-    notifyListeners();
+     notifyListeners();
   }
   setScorer(int _scorer){
     this.currentScorer=this.currentScorer+_scorer;
@@ -95,13 +103,13 @@ Color temporaryFalingColor =Colors.white;
        // print(currentScorerPercentage);
       }
     }
-    notifyListeners();
+  //  notifyListeners();
   }
 
   setOldScorer(){
     this.oldScorer=currentScorer;
     this.oldScorerPercentage=currentScorerPercentage;
-    notifyListeners();
+ //  notifyListeners();
   }
   assignColorToFiredBubbleColor() {
     firedBubbleColor = [];
@@ -111,12 +119,14 @@ Color temporaryFalingColor =Colors.white;
 
       firedBubbleColor.add(bubbleColors[rand]);
     }
-    // notifyListeners();
+ 
   }
   Future firedFunction() async {
 
-      int y = targetY;
-      int x = targetX;
+      // int y = targetY;
+      // int x = targetX;
+    int y = 5;
+    int x = 5;
 
       int newScore =0;
       int defaultScorerForSingleBubble =10;
@@ -167,10 +177,10 @@ Color temporaryFalingColor =Colors.white;
               newScore = newScore + defaultScorerForSingleBubble;
             }
             alreadyCheckedRemoved.add(removedOffsetList.elementAt(b));
-            assignNewValueToBubbleClass(Y1, X1, Colors.transparent, false);
+            assignNewValueToBubbleClass(Y1, X1, BubbleColor0, false);
 
             // Timer(Duration(milliseconds: 100), () {
-            //   assignNewValueToBubbleClass(Y1, X1, Colors.transparent, true);
+            //   assignNewValueToBubbleClass(Y1, X1, BubbleColor0, true);
             // });
             removedOffsetList.remove(removedOffsetList.elementAt(b));
           }
@@ -182,7 +192,7 @@ Color temporaryFalingColor =Colors.white;
         }
 
        setScorer(newScore);
-        notifyListeners();
+      //  notifyListeners();
 
       }
 
@@ -296,6 +306,7 @@ mustCheckedList.add(k);
 
    // setTarget(-1, -1);
    removeEmptyRow();
+
     // fallAndRemoveMethod();
     //function over
   }
@@ -327,9 +338,9 @@ mustCheckedList.add(k);
     if(removeRow.length>0){
       removeRow.remove(removeRow.first);
       bubbles.removeWhere( (e) => removeRow.contains(e));
-      notifyListeners();
-    }
 
+    }
+   // notifyListeners();
 
   }
    assignNewValueToBubbleClass(int y, int x, Color newColor, bool visible)

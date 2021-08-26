@@ -6,10 +6,10 @@ import 'package:bubble/Model/BubbleModel.dart';
 import 'package:bubble/Service/BubbleService.dart';
 import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/main.dart';
-import 'package:bubble/widgets/GameScreen/SubWidget/BubblePanel.dart';
-import 'package:bubble/widgets/GameScreen/SubWidget/ScorerBar.dart';
-import 'package:bubble/widgets/GameScreen/SubWidget/SingleBubble.dart';
-import 'package:bubble/widgets/GameScreen/SubWidget/bottomSection.dart';
+import 'GamePanel/BubblePanel.dart';
+import 'ScorerBar/ScorerBar.dart';
+
+import 'Bottom/bottomSection.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,7 +50,7 @@ class _GameScreenState extends State<GameScreen> {
           children: [
            const ScorerBar(),
 
-         const   JaydipWidget(),
+         Expanded(child: const   JaydipWidget()),
        const     BottomSection(),
           ],
         )));
