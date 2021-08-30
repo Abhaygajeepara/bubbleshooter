@@ -21,6 +21,7 @@ class BubbleModel{
     required this.maxRaw,
     required this.isRender,
   }){
+
     setSurroundings();
     setPosition();
   }

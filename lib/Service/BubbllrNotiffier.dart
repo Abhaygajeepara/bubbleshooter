@@ -23,8 +23,8 @@ Color temporaryFalingColor =Colors.white;
  int bubbleColorInLevel=2;
   // fire
 
-  List<Color> firedBubbleColor = [];
-  int fakeTop = 10;
+  List<Color> fireBubble = [];
+  int fakeTop = 15;
 
   int targetY = -1;
   int targetX = -1;
@@ -43,9 +43,11 @@ Color temporaryFalingColor =Colors.white;
 
   int fixNextTarget =1000;// add 1000 in fixTargetScorer
   int fixedIncreasement=10;
+  Set<Offset> mainFallingNode =Set();
 
   // gameOver
-  bool gameOver= false;
+  bool isGameOver= false;
+  bool isFinish =true;
   BubbleNotifier(){
     setLevelTarget(){
       levelTargetScorer=  (fixScorer*currentLevel)+fixNextTarget;
@@ -62,29 +64,37 @@ Color temporaryFalingColor =Colors.white;
         List<BubbleModel> raw = [];
         for(int j =0;j<a;j++){
           Color bubbleColor = BubbleColor0;
-          var rng = new Random();
+          var rng = new Random(i*j*currentLevel);
+
           int random = rng.nextInt(bubbleColorInLevel);
+
           bubbleColor = bubbleColors[random];
           raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true,maxRaw: maxRaw,isRender: false));
         }
         bubbles.add(raw);
       }
-      // notifyListeners();
+
     }
   }
-  Future removeFiredColorFromQueue(int index) async{
-    firedBubbleColor.removeAt(index);
-    moves = moves - 1;
-    if(moves==0){
-      gameOver=true;
-    }
- //   notifyListeners();
+  Future removeFiredColorFromQueue() async{
+//   print(fireBubble);
+// print(fireBubble.length);
+
+   if(fireBubble.length>0){
+     fireBubble.remove(fireBubble.first);
+     moves = moves - 1;
+     if(moves==0){
+       isGameOver=true;
+       isFinish =true;
+     }
+   }
+
   }
   Future swapFireBubble()async{
-    if(firedBubbleColor.length>=2){
-      Color first =firedBubbleColor.first;
-      firedBubbleColor.removeAt(0);
-      firedBubbleColor.insert(1,first);
+    if(fireBubble.length>=2){
+      Color first =fireBubble.first;
+      fireBubble.remove(fireBubble.first);
+      fireBubble.insert(1,first);
       notifyListeners();
     }
   }
@@ -103,102 +113,122 @@ Color temporaryFalingColor =Colors.white;
        // print(currentScorerPercentage);
       }
     }
-  //  notifyListeners();
+
   }
 
   setOldScorer(){
     this.oldScorer=currentScorer;
     this.oldScorerPercentage=currentScorerPercentage;
- //  notifyListeners();
+
   }
   assignColorToFiredBubbleColor() {
-    firedBubbleColor = [];
+    fireBubble = [];
     for (int i = 0; i < moves; i++) {
       var rng = new Random();
       int rand = rng.nextInt(bubbleColorInLevel);
 
-      firedBubbleColor.add(bubbleColors[rand]);
+      fireBubble.add(bubbleColors[rand]);
     }
  
   }
-  Future firedFunction() async {
+  gameOver(){
+    isGameOver=!isGameOver;
+    print('game Over');
+    notifyListeners();
 
-      // int y = targetY;
-      // int x = targetX;
-    int y = 5;
-    int x = 5;
+  }
+  Future clearFalling()async{
+    mainFallingNode.map((e) {
+      int y = e.dy.toInt();
+      int x =e.dx.toInt();
+      bubbles[y][x].bubbleColor=BubbleColor0;
+    }).toList();
+    mainFallingNode.clear();
+print(mainFallingNode.length);
+    //notifyListeners();
+  }
+  Future fireFunction() async {
+    removeFiredColorFromQueue();
+    clearFalling();
+      if(isGameOver==false){
+        print('before fake top =${fakeTop}');
+        int y = 22;
+        int x = 8;
 
-      int newScore =0;
-      int defaultScorerForSingleBubble =10;
-      Color newBubbleColor = firedBubbleColor[0];
-      removeCoordinatedMain.clear();
-      fallingNodesMain = Set();
-      setOldScorer();
-
-
-
-      if (y>=fakeTop) {
-        assignNewValueToBubbleClass(
-            y, x, newBubbleColor, true); // set new Color to define node
-        Set<Offset> removedOffsetList =Set();
-        Set<Offset> alreadyCheckedRemoved =Set();
-        removedOffsetList.clear();
-        removedOffsetList.add(Offset(x.toDouble(),y.toDouble()));
-        alreadyCheckedRemoved.add(Offset(x.toDouble(),y.toDouble()));
-
-        for(Offset a in bubbles[y][x].surroundingCoordinate ){
-          int newY =a.dy.toInt();
-          int newX =a.dx.toInt();
-          if(a.dy>=fakeTop  && bubbles[newY][newX].bubbleColor==newBubbleColor){
-            removedOffsetList.add(a);
-
-          }
-        }
-
-        do {
-          for (int b = 0; b < removedOffsetList.length; b++) {
-            int Y1 = removedOffsetList.elementAt(b).dy.toInt();
-            int X1 = removedOffsetList.elementAt(b).dx.toInt();
-            Offset currrentOffset = bubbles[Y1][X1].bubbleCoordinate;
-            if(alreadyCheckedRemoved.contains(currrentOffset) == false  &&Y1 >= fakeTop){
+        int newScore =0;
+        int defaultScorerForSingleBubble =10;
+        Color newBubbleColor = fireBubble[0];
+        removeCoordinatedMain.clear();
+        fallingNodesMain = Set();
+        setOldScorer();
 
 
-              for (int c = 0; c < bubbles[Y1][X1].surroundingCoordinate.length;c++) {
-                Offset addNew =
-                bubbles[Y1][X1].surroundingCoordinate.elementAt(c);
-                int checkY1 = addNew.dy.toInt();
-                int checkX1 = addNew.dx.toInt();
-                if (bubbles[checkY1][checkX1].bubbleColor == newBubbleColor && checkY1>=fakeTop) {
-                  removedOffsetList.add(addNew);
-                }
 
-              }
-              defaultScorerForSingleBubble = defaultScorerForSingleBubble + fixedIncreasement;
-              newScore = newScore + defaultScorerForSingleBubble;
+        if (y>=fakeTop) {
+          assignNewValueToBubbleClass(
+              y, x, newBubbleColor, true); // set new Color to define node
+          Set<Offset> removedOffsetList =Set();
+          Set<Offset> alreadyCheckedRemoved =Set();
+          removedOffsetList.clear();
+          removedOffsetList.add(Offset(x.toDouble(),y.toDouble()));
+          alreadyCheckedRemoved.add(Offset(x.toDouble(),y.toDouble()));
+
+          for(Offset a in bubbles[y][x].surroundingCoordinate ){
+            int newY =a.dy.toInt();
+            int newX =a.dx.toInt();
+            if(a.dy>=fakeTop  && bubbles[newY][newX].bubbleColor==newBubbleColor){
+              removedOffsetList.add(a);
+
             }
-            alreadyCheckedRemoved.add(removedOffsetList.elementAt(b));
-            assignNewValueToBubbleClass(Y1, X1, BubbleColor0, false);
-
-            // Timer(Duration(milliseconds: 100), () {
-            //   assignNewValueToBubbleClass(Y1, X1, BubbleColor0, true);
-            // });
-            removedOffsetList.remove(removedOffsetList.elementAt(b));
           }
-        } while (removedOffsetList.length != 0);
+
+          do {
+            for (int b = 0; b < removedOffsetList.length; b++) {
+              int Y1 = removedOffsetList.elementAt(b).dy.toInt();
+              int X1 = removedOffsetList.elementAt(b).dx.toInt();
+              Offset currrentOffset = bubbles[Y1][X1].bubbleCoordinate;
+              if(alreadyCheckedRemoved.contains(currrentOffset) == false  &&Y1 >= fakeTop){
 
 
-        if(removedOffsetList.length==0){
-          calculateFalling();
+                for (int c = 0; c < bubbles[Y1][X1].surroundingCoordinate.length;c++) {
+                  Offset addNew =
+                  bubbles[Y1][X1].surroundingCoordinate.elementAt(c);
+                  int checkY1 = addNew.dy.toInt();
+                  int checkX1 = addNew.dx.toInt();
+                  if (bubbles[checkY1][checkX1].bubbleColor == newBubbleColor && checkY1>=fakeTop) {
+                    removedOffsetList.add(addNew);
+                  }
+
+                }
+                defaultScorerForSingleBubble = defaultScorerForSingleBubble + fixedIncreasement;
+                newScore = newScore + defaultScorerForSingleBubble;
+              }
+              alreadyCheckedRemoved.add(removedOffsetList.elementAt(b));
+              assignNewValueToBubbleClass(Y1, X1, BubbleColor0, false);
+
+              // Timer(Duration(milliseconds: 100), () {
+              //   assignNewValueToBubbleClass(Y1, X1, BubbleColor0, true);
+              // });
+              removedOffsetList.remove(removedOffsetList.elementAt(b));
+            }
+          } while (removedOffsetList.length != 0);
+
+
+          if(removedOffsetList.length==0){
+            calculateFalling();
+          }
+
+          setScorer(newScore);
+
+
         }
-
-       setScorer(newScore);
-      //  notifyListeners();
-
       }
+
 
   }
 
   calculateFalling() {
+    mainFallingNode.clear();
     final Set<Offset> checkedNode = Set();
     final Set<Offset> mustCheckedList = Set();
     fallingNodesMain = Set();
@@ -295,18 +325,27 @@ mustCheckedList.add(k);
           Offset guessOffset = Offset(offsetX.toDouble(), offsetY.toDouble());
 
           if (checkedNode.contains(guessOffset) == false) {
-            bubbles[a][b].bubbleColor = temporaryFalingColor;
-            bubbles[a][b].isRender = true;
 
+            bubbles[a][b].isRender = true;
+            mainFallingNode.add(guessOffset);
             //fallingNodesMain.add(guessOffset);
           }
         }
       }
     }
+    //notFallingNode =checkedNode;
 
    // setTarget(-1, -1);
-   removeEmptyRow();
+   //removeEmptyRow();
 
+    if(fakeTop>1){
+      fakeTop =fakeTop-1;
+      min(fakeTop, 0);
+
+    }else{
+      fakeTop=0;
+    }
+    notifyListeners();
     // fallAndRemoveMethod();
     //function over
   }
@@ -324,13 +363,7 @@ mustCheckedList.add(k);
         }
       }
       if(!isBubbleEmpty.contains(false)){
-        if(fakeTop>1){
-          fakeTop =fakeTop-1;
-          min(fakeTop, 0);
 
-        }else{
-          fakeTop=0;
-        }
         removeRow.add(bubbles[a]);
       }
     }
@@ -340,6 +373,7 @@ mustCheckedList.add(k);
       bubbles.removeWhere( (e) => removeRow.contains(e));
 
     }
+    print('before fake top =${fakeTop}');
    // notifyListeners();
 
   }

@@ -13,39 +13,65 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 
-
+double animationStart =0.0;
+double animationEnd=32.0;
 class JaydipWidget extends StatefulHookWidget {
   const JaydipWidget();
   @override
   _JaydipWidgetState createState() => _JaydipWidgetState();
 }
 
-class _JaydipWidgetState extends State<JaydipWidget> {
+class _JaydipWidgetState extends State<JaydipWidget> with TickerProviderStateMixin {
+ late AnimationController animationController;
+ late Animation animation;
+ @override
+  void initState() {
+   initialAnimation();
+    // TODO: implement initState
+    super.initState();
+  }
+  initialAnimation(){
+   animationController =AnimationController(vsync: this,duration: Duration(seconds: 3));
+   animation =Tween(begin: animationStart,end: animationEnd).animate(CurvedAnimation(parent: animationController, curve: Curves.easeIn));
+
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final bubbleData = useProvider(jBubbleProvider);
-    print('gamePanel');
+  animationController.reset();
+    animationController.forward();
+
     double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
     return Container(
       height: size.height * 0.65,
       child: Stack(
         children: [
-          SingleChildScrollView(
-            child: RepaintBoundary(
-              child: CustomPaint(
-                painter: levelPainter(bubbleNotifier:bubbleData),
-                size: size,
 
-              ),
+               AnimatedBuilder(
+                 animation: animationController,
+                 builder: (context, snapshot) {
+
+                   return RepaintBoundary(
+                    child: CustomPaint(
+                      painter: levelPainter(bubbleNotifier:bubbleData,context: context,animationValue: animation.value),
+                      size: size,
+
+                    ),
+              );
+                 }
+               ),
+
+         bubbleData.isGameOver? Center(
+            child: Container(
+              height: 500,
+              width: 200,
+              color: Colors.white,
+              child: Text('GameOver'),
             ),
-          ),
+          ):Container(),
           
-          // for (List<BubbleModel> i in bubbleData.bubbles)
-          //   for (   BubbleModel j in i)
-          //
-          //     if(!j.isRender)
-          //     SingleBubble(bubbleModel: j,)
+
         ],
       ),
     );
@@ -55,7 +81,10 @@ class _JaydipWidgetState extends State<JaydipWidget> {
 
 class levelPainter extends CustomPainter{
   BubbleNotifier bubbleNotifier;
-  levelPainter({required this.bubbleNotifier});
+  BuildContext context;
+  double animationValue;
+
+  levelPainter({required this.bubbleNotifier,required this.context,required this.animationValue});
   @override
   void paint(Canvas canvas, Size size) {
 
@@ -68,32 +97,76 @@ class levelPainter extends CustomPainter{
         if(j.bubbleColor!= BubbleColor0){
           double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
           double initialTop = size.width/21;
-       double   top = initialTop  + (ballWidth -2) * iteration;
-          double x =size.width*(j.j)/bubbleNotifier.bubbles[i].length;
-        //  double y =size.height*(j.i)/bubbleModel.length;
-          double y =size.height*(j.i)/numberOfBubbleInColumn;
-          Offset o =Offset(j.left,top);
-          final paint =Paint()
+          final paint =Paint();
+         late Offset o;
+          if(bubbleNotifier.mainFallingNode.contains(j.bubbleCoordinate)==false){
+            double   top = initialTop  + (ballWidth -2) * iteration;
+            o =Offset(j.left,top);
 
-            ..color=j.bubbleColor
-            ..shader=RadialGradient(
-              colors: [
-                j.bubbleColor,
-                Colors.black,
 
-              ],
-            ).createShader(Rect.fromCircle(
-              center: o,
-              radius: ballWidth,
-            ))
-          ;
+              paint..color=j.bubbleColor
+              ..shader=RadialGradient(
+                colors: [
+                  j.bubbleColor,
+                  Colors.black,
 
+                ],
+              ).createShader(Rect.fromCircle(
+                center: o,
+                radius: ballWidth,
+              ))
+            ;
+
+
+          }else{
+            double newTop = iteration+animationValue*2;
+            if(newTop>16){
+              newTop=16;
+            }
+            double   top = initialTop  + (ballWidth -2) * newTop;
+            o =Offset(j.left,top);
+             paint..color=j.bubbleColor
+              ..shader=RadialGradient(
+                colors: [
+                  j.bubbleColor,
+                  Colors.black,
+
+                ],
+              ).createShader(Rect.fromCircle(
+                center: o,
+                radius: ballWidth,
+              ))
+            ;
+
+
+
+          }
           canvas.drawCircle(o, size.width/numberOfBubbleInColumn, paint);
         }
 
 
       }
-      iteration=iteration+1;
+      if(animationValue==animationEnd){
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+         bubbleNotifier.clearFalling();
+
+        });
+      }
+     if(iteration<17){
+       iteration=iteration+1;
+       if(iteration>=15){
+         WidgetsBinding.instance!.addPostFrameCallback((_) {
+        if(  bubbleNotifier.isGameOver==false){
+          bubbleNotifier.gameOver();
+        }
+
+         });
+
+       }
+     }
+
+
+
     }
 
 

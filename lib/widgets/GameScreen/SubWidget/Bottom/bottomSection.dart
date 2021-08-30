@@ -48,15 +48,16 @@ class _BotomSectionState extends State<BottomSection> with TickerProviderStateMi
 
     bx = size.width / 2;
     by = size.height * .15;
-    print('bottom');
+    //print('bottom');
     return GestureDetector(
       onPanEnd: (val) {
-        print("pan end");
+        //print("pan end");
+
       },
       onPanDown: (val) {
         x = val.localPosition.dx;
         y = val.localPosition.dy;
-        // print('x='+x.toString()+"//"+"y=" +y.toString());
+        // //print('x='+x.toString()+"//"+"y=" +y.toString());
       },
       onPanUpdate: (val) {
         x = val.localPosition.dx;
@@ -95,7 +96,7 @@ class _BotomSectionState extends State<BottomSection> with TickerProviderStateMi
                child: AnimatedBuilder(
                   animation: animationController,
                   builder: (context, snapshot) {
-                    print(animation.value);
+                    //print(animation.value);
                     return Container(
                       width: size.height*0.15,
                       height: size.height*0.15,
@@ -104,7 +105,10 @@ class _BotomSectionState extends State<BottomSection> with TickerProviderStateMi
 
                       ),
                       child: GestureDetector(
+                        onTap: (){
+                          bubbleData.fireFunction();
 
+                        },
                         onHorizontalDragEnd: (va){
                           animationController.reset();
                           animationController.forward().whenComplete(() {
@@ -113,9 +117,10 @@ class _BotomSectionState extends State<BottomSection> with TickerProviderStateMi
 
 
                         },
-                        child: CustomPaint(
+                        child:   CustomPaint(
                           size: size,
-                          painter: FireTank(colors: [bubbleData.firedBubbleColor.first,bubbleData.firedBubbleColor[1]],animationValue: animation.value,fullScreenSize: size),
+                          painter: FireTank(bubbleNotifier: bubbleData
+                              ,animationValue: animation.value,fullScreenSize: size),
                         ),
                       ),
                     );
@@ -124,55 +129,7 @@ class _BotomSectionState extends State<BottomSection> with TickerProviderStateMi
              ),
 
 
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //
-              //     //firedBubbleQueue(bubbleData),
-              //     // Text( "y="+bubbleData.targetY.toString()+"   "+"x="+bubbleData.targetY.toString(),
-              //     //   style: TextStyle(
-              //     //       fontSize: 16,
-              //     //       fontWeight: FontWeight.bold,
-              //     //       color: Colors.white
-              //     //   ),
-              //     // ),
-              //     bubbleData.firedBubbleColor.length <= 0
-              //         ? Container()
-              //         : FiredBubble(
-              //             bubbleColor: bubbleData.firedBubbleColor[0]),
-              //     ElevatedButton(
-              //         onPressed: () async {
-              //           if (bubbleData.firedBubbleColor.length != 0) {
-              //             await bubbleData.firedFunction();
-              //             // print(bubbleData.bubbles[5][5].surroundingCoordinate);
-              //             await bubbleData.removeFiredColorFromQueue(0);
-              //             //await bubbleData.fallAndRemoveMethod();
-              //             //  await bubbleData.removeRow();
-              //           } else {
-              //             showDialog(
-              //                 context: context,
-              //                 builder: (context) {
-              //                   return AlertDialog(
-              //                     content: Column(
-              //                       mainAxisSize: MainAxisSize.min,
-              //                       children: [
-              //                         Text('kal aa na'),
-              //                         ElevatedButton(
-              //                             onPressed: () {
-              //                               // bubbleData.setDefaultData();
-              //                               // bubbleData.assignColorToFiredBubbleColor();
-              //                               Navigator.pop(context);
-              //                             },
-              //                             child: Text('restart'))
-              //                       ],
-              //                     ),
-              //                   );
-              //                 });
-              //           }
-              //         },
-              //         child: Text('Fire'))
-              //   ],
-              // ),
+
             ],
           )),
     );
@@ -184,7 +141,7 @@ class LineWidget extends HookWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final lineData = useProvider(lineProvider);
-    // print(lineData.lines[0].toString());
+    // //print(lineData.lines[0].toString());
     return CustomPaint(
       child: Container(
         height: size.height * 0.3,
@@ -205,18 +162,14 @@ class LineDrawer extends CustomPainter {
     Paint paint = Paint();
     if (lines.isNotEmpty) {
       canvas.translate(lines[0].start.dx, lines[0].start.dy);
-      // print((size.width/2).toString()+"width"+(size.height).toString()+"height");
+      // //print((size.width/2).toString()+"width"+(size.height).toString()+"height");
       Paint p = Paint();
       p
         ..color = Colors.red
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2;
-      // canvas.drawLine(Offset.zero, lines[0].end, p);
-      // canvas.translate(lines[0].end.dx,lines[0].end.dy);
-      // canvas.drawLine(Offset.zero, Offset(100,100), p);
       for (int i = 0; i < lines.length; i++) {
         canvas.drawLine(Offset.zero, lines[i].end, p);
-
         canvas.translate(lines[i].end.dx, lines[i].end.dy);
       }
 
@@ -233,9 +186,9 @@ class LineDrawer extends CustomPainter {
 //
 class FireTank extends CustomPainter{
   Size fullScreenSize;
-  List<Color> colors;
+  BubbleNotifier bubbleNotifier;
   double animationValue;
-  FireTank({required  this.colors,required this.animationValue,required this.fullScreenSize});
+  FireTank({required  this.bubbleNotifier,required this.animationValue,required this.fullScreenSize});
   @override
   void paint(Canvas canvas, Size size) {
 
@@ -250,30 +203,41 @@ class FireTank extends CustomPainter{
     double mainCircleRadius =bottomHeight*mainRadius;
 
     canvas.drawCircle(Offset(size.width/2,size.height*0.5), mainCircleRadius, ringPaint);
-    for(int i=0;i<colors.length;i++){
-      Offset bubbleOffset;
-      if(i==1){
-         bubbleOffset = Offset((size.width / 2)+mainCircleRadius-animationValue, (size.height * 0.5));
-      }
+    if(bubbleNotifier.fireBubble.length>1){
+      if(bubbleNotifier.fireBubble.length>2){
+          Offset bubbleOffset= Offset((size.width / 2)+mainCircleRadius-animationValue, (size.height * 0.5));
+          Paint bubblePaint = Paint()
+            ..shader = RadialGradient(
+              colors: [
+                bubbleNotifier.fireBubble[1],
+                Colors.black,
+              ],
+            ).createShader(Rect.fromCircle(
+              center: bubbleOffset,
+              radius: ballWidth,
+            )
+            )
+          ;
+          canvas.drawCircle(bubbleOffset, (bottomWidth/numberOfBubbleInColumn), bubblePaint);
 
-      else{
-        bubbleOffset = Offset((size.width / 2)+animationValue, (size.height * 0.5));
       }
-
+      Offset centerBubble =Offset((size.width / 2)+animationValue, (size.height * 0.5));
       Paint bubblePaint = Paint()
         ..shader = RadialGradient(
           colors: [
-            colors[i],
+            bubbleNotifier.fireBubble[1],
             Colors.black,
           ],
         ).createShader(Rect.fromCircle(
-          center: bubbleOffset,
+          center: centerBubble,
           radius: ballWidth,
         )
         )
       ;
-      canvas.drawCircle(bubbleOffset, (bottomWidth/numberOfBubbleInColumn), bubblePaint);
-}
+      canvas.drawCircle(centerBubble, (bottomWidth/numberOfBubbleInColumn), bubblePaint);
+
+    }
+
 
   }
 

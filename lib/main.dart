@@ -5,12 +5,15 @@ import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/widgets/Home/HomeScreen.dart';
 import 'package:bubble/widgets/SplashScreen/splash.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'widgets/GameScreen/SubWidget/GameScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(ProviderScope(child: MyApp()));
 
 }

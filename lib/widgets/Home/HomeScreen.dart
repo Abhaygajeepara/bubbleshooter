@@ -1,5 +1,6 @@
 import 'package:bubble/Common/Commonvalue.dart';
 import 'package:bubble/Model/BubbleModel.dart';
+import 'package:bubble/Service/Ads/AdService.dart';
 import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/main.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulHookWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  AdsService adservice =AdsService();
   @override
   Widget build(BuildContext context) {
     final bubbleData = useProvider(jBubbleProvider);
@@ -21,13 +23,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       //backgroundColor: Colors.white,
-      body: Stack(
+      body: Column(
+       
         children: [
-          CustomPaint(
-            painter: HomeCanvas(),
-            size: size,
-
-          )
+          ElevatedButton(
+            onPressed: ()async{
+            await  adservice.loadAd();
+              setState(() {
+                print('acac');
+              });
+            },
+            child: Text('Show add'),
+          ),
+          Expanded(child: adservice.bannerWidget)
         ],
       )
     );
