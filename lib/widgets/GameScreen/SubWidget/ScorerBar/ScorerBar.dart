@@ -61,7 +61,7 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
       if(isPercentageOverHundred ==false){
         percentageController.reset();
         percentageController.forward();
-        print(provider.currentScorerPercentage);
+       // print(provider.currentScorerPercentage);
       }
       if(provider.currentScorerPercentage==100.0){
         isPercentageOverHundred=true;
@@ -110,18 +110,18 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
                     child: Stack(
                       children: [
 
-                        Container(
-
-
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: borderRadius,
-                          ),
-                        ),
+                        // Container(
+                        //
+                        //
+                        //   decoration: BoxDecoration(
+                        //     color: Colors.transparent,
+                        //     borderRadius: borderRadius,
+                        //   ),
+                        // ),
                         percentageAnimation.value!=0? Container(
                          // constraints: BoxConstraints(minWidth: 0, maxWidth:  0),
                           height: size.height*0.03,
-                          width:   (size.width*0.006*percentageAnimation.value),
+                          //width:   (size.width*0.006*percentageAnimation.value),
 
                           decoration: BoxDecoration(
                             borderRadius: borderRadius,

@@ -105,15 +105,20 @@ class _BotomSectionState extends State<BottomSection> with TickerProviderStateMi
 
                       ),
                       child: GestureDetector(
-                        onTap: (){
-                          bubbleData.fireFunction();
+                        onTap: ()async{
+                         if(!bubbleData.isDisappearAnimation && !bubbleData.isFallingAnimation){
+                        await   bubbleData.fireFunction();
+                        await bubbleData.calculateFalling();
+                      //  await bubbleData.screenBubble(size,0.0,0.0);
+                         }
+
 
                         },
                         onHorizontalDragEnd: (va){
-                          animationController.reset();
-                          animationController.forward().whenComplete(() {
-                            bubbleData.swapFireBubble();
-                          });
+                          // animationController.reset();
+                          // animationController.forward().whenComplete(() {
+                          //   bubbleData.swapFireBubble();
+                          // });
 
 
                         },
@@ -204,28 +209,28 @@ class FireTank extends CustomPainter{
 
     canvas.drawCircle(Offset(size.width/2,size.height*0.5), mainCircleRadius, ringPaint);
     if(bubbleNotifier.fireBubble.length>1){
-      if(bubbleNotifier.fireBubble.length>2){
-          Offset bubbleOffset= Offset((size.width / 2)+mainCircleRadius-animationValue, (size.height * 0.5));
-          Paint bubblePaint = Paint()
-            ..shader = RadialGradient(
-              colors: [
-                bubbleNotifier.fireBubble[1],
-                Colors.black,
-              ],
-            ).createShader(Rect.fromCircle(
-              center: bubbleOffset,
-              radius: ballWidth,
-            )
-            )
-          ;
-          canvas.drawCircle(bubbleOffset, (bottomWidth/numberOfBubbleInColumn), bubblePaint);
-
-      }
+      // if(bubbleNotifier.fireBubble.length>2){
+      //     Offset bubbleOffset= Offset((size.width / 2)+mainCircleRadius-animationValue, (size.height * 0.5));
+      //     Paint bubblePaint = Paint()
+      //       ..shader = RadialGradient(
+      //         colors: [
+      //           bubbleNotifier.fireBubble[1],
+      //           Colors.black,
+      //         ],
+      //       ).createShader(Rect.fromCircle(
+      //         center: bubbleOffset,
+      //         radius: ballWidth,
+      //       )
+      //       )
+      //     ;
+      //     canvas.drawCircle(bubbleOffset, (bottomWidth/numberOfBubbleInColumn), bubblePaint);
+      //
+      // }
       Offset centerBubble =Offset((size.width / 2)+animationValue, (size.height * 0.5));
       Paint bubblePaint = Paint()
         ..shader = RadialGradient(
           colors: [
-            bubbleNotifier.fireBubble[1],
+            bubbleNotifier.fireBubble[0],
             Colors.black,
           ],
         ).createShader(Rect.fromCircle(

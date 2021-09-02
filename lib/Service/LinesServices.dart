@@ -4,6 +4,14 @@ import 'dart:math'as math;
 final lineProvider = ChangeNotifierProvider((ref) => LineService());
 class LineService extends ChangeNotifier{
   List<Line> lines = [];
+  // todo remove if not work
+ late double xAd;
+ late double yAd;
+ setXY(double x,double y){
+   xAd =x;
+   yAd =y;
+   notifyListeners();
+ }
   void calculate(double bx,double by ,double x,double y,Size size){
     final width = size.width;
     bx = width /2;

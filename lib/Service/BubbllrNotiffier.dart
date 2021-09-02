@@ -20,17 +20,17 @@ Color temporaryFalingColor =Colors.white;
   List<List<BubbleModel>> bubbles = [];
   bool isInitialized = false;
   List<Color> bubbleColors = [BubbleColor1, BubbleColor2, BubbleColor3];
- int bubbleColorInLevel=2;
+ int bubbleColorInLevel=3;
   // fire
 
   List<Color> fireBubble = [];
-  int fakeTop = 15;
+  int fakeTop = 20;
 
   int targetY = -1;
   int targetX = -1;
   //remove fall nodes
-  Set<Offset> removeCoordinatedMain = Set();
-  Set<Offset> fallingNodesMain = Set();
+//  Set<Offset> removeCoordinatedMain = Set();
+Set<Offset> mainRemoveNodes = Set();
 //moves
   int moves = 10;
   // score
@@ -44,6 +44,8 @@ Color temporaryFalingColor =Colors.white;
   int fixNextTarget =1000;// add 1000 in fixTargetScorer
   int fixedIncreasement=10;
   Set<Offset> mainFallingNode =Set();
+  bool isDisappearAnimation =false;
+  bool isFallingAnimation =false;
 
   // gameOver
   bool isGameOver= false;
@@ -55,8 +57,15 @@ Color temporaryFalingColor =Colors.white;
     //  notifyListeners();
     }
   }
+
+  turnOffAnimation()async{
+    this.isDisappearAnimation =false;
+    this.isFallingAnimation =false;
+   await removeEmptyRow();
+    notifyListeners();
+  }
   //BubbleNotifier();
-  void init(Size size){
+  void init(Size size)async{
     if(!isInitialized){
       bubbles.clear();
       for(int i =0;i<maxRaw;i++){
@@ -69,12 +78,16 @@ Color temporaryFalingColor =Colors.white;
           int random = rng.nextInt(bubbleColorInLevel);
 
           bubbleColor = bubbleColors[random];
-          raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true,maxRaw: maxRaw,isRender: false));
+          raw.add(BubbleModel(size: size, i: i, j: j, bubbleColor: bubbleColor, isVisible: true,maxRaw: maxRaw));
         }
         bubbles.add(raw);
       }
 
     }
+    // else{
+    //   screenBubble(size);
+    // }
+   await screenBubble(size,0.0,0.0);
   }
   Future removeFiredColorFromQueue() async{
 //   print(fireBubble);
@@ -92,9 +105,13 @@ Color temporaryFalingColor =Colors.white;
   }
   Future swapFireBubble()async{
     if(fireBubble.length>=2){
-      Color first =fireBubble.first;
-      fireBubble.remove(fireBubble.first);
+
+      Color first =fireBubble.removeAt(0);
+
+      fireBubble.removeAt(0);
+
       fireBubble.insert(1,first);
+
       notifyListeners();
     }
   }
@@ -104,10 +121,17 @@ Color temporaryFalingColor =Colors.white;
      notifyListeners();
   }
   setScorer(int _scorer){
+
     this.currentScorer=this.currentScorer+_scorer;
     if(currentScorerPercentage<=100.0){
-      currentScorerPercentage=currentScorer/levelTargetScorer;
+      currentScorerPercentage=currentScorer.toDouble();
+
       currentScorerPercentage=currentScorerPercentage*100;
+
+      if(currentScorerPercentage ==double.nan){
+        currentScorerPercentage =0.0;
+      }
+
       if(currentScorerPercentage>100.0){
         currentScorerPercentage =100.0;
        // print(currentScorerPercentage);
@@ -122,14 +146,14 @@ Color temporaryFalingColor =Colors.white;
 
   }
   assignColorToFiredBubbleColor() {
-    fireBubble = [];
+    fireBubble = [Colors.white60];
     for (int i = 0; i < moves; i++) {
       var rng = new Random();
       int rand = rng.nextInt(bubbleColorInLevel);
 
       fireBubble.add(bubbleColors[rand]);
     }
- 
+
   }
   gameOver(){
     isGameOver=!isGameOver;
@@ -137,32 +161,120 @@ Color temporaryFalingColor =Colors.white;
     notifyListeners();
 
   }
+
+  Future screenBubble(Size size,double opacityAnimation,double fallingAnimation)async{
+   // print(fallingAnimation);
+    int iteration =0;
+    for(int i=fakeTop;i<bubbles.length;i++){
+      for(int k=0;k<bubbles[i].length;k++){
+        BubbleModel j =bubbles[i][k];
+        if(j.bubbleColor!= BubbleColor0){
+          double ballWidth = (size.width - totalPaddingInRow) / numberOfBubbleInRow;
+          double initialTop = size.width/21;
+          final paint =Paint();
+          late double top;
+          Color _bubbleColor =j.bubbleColor;
+          Color shadow =Colors.black;
+          top = initialTop  + (ballWidth -2) * iteration;
+
+          if(mainFallingNode.contains(j.bubbleCoordinate)==false){
+            if(mainRemoveNodes.contains(j.bubbleCoordinate)){
+              _bubbleColor =j.bubbleColor.withOpacity(opacityAnimation);
+              shadow=shadow.withOpacity(opacityAnimation);
+            }
+               top = initialTop  + (ballWidth -2) * iteration;
+
+          }else{
+            double newTop = iteration+fallingAnimation*2;
+            double localOpacity =1.0;
+            if(newTop>16){
+              newTop=16;
+              localOpacity =0.0;
+            }
+            _bubbleColor =_bubbleColor.withOpacity(localOpacity);
+               top = initialTop  + (ballWidth -2) * newTop;
+             //  top = initialTop  + (ballWidth -2) * iteration;
+
+          }
+          j.top =top;
+
+          j.bubbleColor =_bubbleColor;
+        }
+
+      }
+      if(iteration<17){
+        iteration=iteration+1;
+        if(iteration>=15){
+          if(  isGameOver==false){
+            gameOver();
+          }
+
+        }
+      }
+
+
+
+    }
+   // notifyListeners();
+  }
+  Future clearRemoveNode()async{
+    mainRemoveNodes.map((e)async {
+      int y = e.dy.toInt();
+      int x =e.dx.toInt();
+      bubbles[y][x].bubbleColor=BubbleColor0;
+      notifyListeners();
+    }).toList();
+    mainRemoveNodes.clear();
+    if(isDisappearAnimation){
+      isFallingAnimation =true; //if there more than 3 bubble with color then set isFallingAnimation =true
+    }
+    isDisappearAnimation =false;
+
+   await calculateFalling();
+
+
+    //notifyListeners();
+  }
+  setNewFake(){
+    if(fakeTop>1){
+      fakeTop =fakeTop-1;
+      min(fakeTop, 0);
+
+    }else{
+      fakeTop=0;
+    }
+    clearFalling();
+    notifyListeners();
+  }
   Future clearFalling()async{
     mainFallingNode.map((e) {
       int y = e.dy.toInt();
       int x =e.dx.toInt();
       bubbles[y][x].bubbleColor=BubbleColor0;
+
     }).toList();
     mainFallingNode.clear();
-print(mainFallingNode.length);
+    notifyListeners();
+
     //notifyListeners();
   }
   Future fireFunction() async {
-    removeFiredColorFromQueue();
+
     clearFalling();
+     clearRemoveNode();
+
       if(isGameOver==false){
-        print('before fake top =${fakeTop}');
+
         int y = 22;
         int x = 8;
 
         int newScore =0;
         int defaultScorerForSingleBubble =10;
         Color newBubbleColor = fireBubble[0];
-        removeCoordinatedMain.clear();
-        fallingNodesMain = Set();
+
+
+
         setOldScorer();
-
-
 
         if (y>=fakeTop) {
           assignNewValueToBubbleClass(
@@ -181,8 +293,8 @@ print(mainFallingNode.length);
 
             }
           }
-
           do {
+
             for (int b = 0; b < removedOffsetList.length; b++) {
               int Y1 = removedOffsetList.elementAt(b).dy.toInt();
               int X1 = removedOffsetList.elementAt(b).dx.toInt();
@@ -204,34 +316,43 @@ print(mainFallingNode.length);
                 newScore = newScore + defaultScorerForSingleBubble;
               }
               alreadyCheckedRemoved.add(removedOffsetList.elementAt(b));
-              assignNewValueToBubbleClass(Y1, X1, BubbleColor0, false);
+              mainRemoveNodes.add(bubbles[Y1][X1].bubbleCoordinate);
+
+             // assignNewValueToBubbleClass(Y1, X1, BubbleColor0, false);
 
               // Timer(Duration(milliseconds: 100), () {
               //   assignNewValueToBubbleClass(Y1, X1, BubbleColor0, true);
               // });
               removedOffsetList.remove(removedOffsetList.elementAt(b));
             }
+
           } while (removedOffsetList.length != 0);
+          isDisappearAnimation =true;
+
+          if(mainRemoveNodes.length<3){
 
 
-          if(removedOffsetList.length==0){
-            calculateFalling();
+            mainRemoveNodes.clear();
+            isDisappearAnimation =false;
+          }else{
+            isDisappearAnimation =true;
           }
+          print('after${isDisappearAnimation}');
 
           setScorer(newScore);
-
-
         }
       }
 
-
+    removeFiredColorFromQueue();
+      notifyListeners();
   }
 
-  calculateFalling() {
+  Future calculateFalling() async{
+    print('calcuate fal');
     mainFallingNode.clear();
     final Set<Offset> checkedNode = Set();
     final Set<Offset> mustCheckedList = Set();
-    fallingNodesMain = Set();
+
 
     for (int j = 0; j < bubbles[fakeTop].length; j++) {
       if (bubbleColors.contains(bubbles[fakeTop][j].bubbleColor)) {
@@ -325,8 +446,6 @@ mustCheckedList.add(k);
           Offset guessOffset = Offset(offsetX.toDouble(), offsetY.toDouble());
 
           if (checkedNode.contains(guessOffset) == false) {
-
-            bubbles[a][b].isRender = true;
             mainFallingNode.add(guessOffset);
             //fallingNodesMain.add(guessOffset);
           }
@@ -338,19 +457,12 @@ mustCheckedList.add(k);
    // setTarget(-1, -1);
    //removeEmptyRow();
 
-    if(fakeTop>1){
-      fakeTop =fakeTop-1;
-      min(fakeTop, 0);
-
-    }else{
-      fakeTop=0;
-    }
     notifyListeners();
     // fallAndRemoveMethod();
     //function over
   }
 
-  removeEmptyRow()async{
+  Future removeEmptyRow()async{
     List<List<BubbleModel>> removeRow =[];
     for(int a=fakeTop;a<bubbles.length;a++){
       List<bool> isBubbleEmpty =[];
@@ -373,7 +485,7 @@ mustCheckedList.add(k);
       bubbles.removeWhere( (e) => removeRow.contains(e));
 
     }
-    print('before fake top =${fakeTop}');
+
    // notifyListeners();
 
   }

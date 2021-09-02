@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 class BubbleModel{
   Color bubbleColor;
   late double left;
-  //late double top;
+  late double top;
   int  i,j;
   late Offset bubbleCoordinate;
   late Set<Offset> surroundingCoordinate;
   bool isVisible;
   Size size;
   int  maxRaw;
-  bool isRender =false;
+
   BubbleModel({
     required this.size,
     required this.i,
@@ -19,7 +19,7 @@ class BubbleModel{
     required this.bubbleColor,
     required this.isVisible,
     required this.maxRaw,
-    required this.isRender,
+
   }){
 
     setSurroundings();
