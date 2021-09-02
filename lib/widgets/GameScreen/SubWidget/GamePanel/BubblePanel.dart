@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:bubble/Common/Commonvalue.dart';
 import 'package:bubble/Common/commmonTitle.dart';
+import 'package:bubble/Common/customTextStyle.dart';
 import 'package:bubble/Model/Bubble.dart';
 import 'package:bubble/Model/BubbleModel.dart';
 import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/Service/LinesServices.dart';
 import 'package:bubble/main.dart';
 import 'package:bubble/widgets/GameScreen/SubWidget/Bottom/bottomSection.dart';
+import 'package:bubble/widgets/GameScreen/SubWidget/PopupMenu/GameOverPopUp.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -51,6 +53,7 @@ class _JaydipWidgetState extends State<JaydipWidget> with TickerProviderStateMix
     final bubbleData = useProvider(jBubbleProvider);
     final lineData = context.read(lineProvider);
   print('build');
+  print(bubbleData.isGameOver);
   if(bubbleData.isDisappearAnimation){
 
     opacityController.reset();
@@ -101,14 +104,7 @@ class _JaydipWidgetState extends State<JaydipWidget> with TickerProviderStateMix
                  }
                ),
 
-         bubbleData.isGameOver? Center(
-            child: Container(
-              height: 500,
-              width: 200,
-              color: Colors.white,
-              child: Text('GameOver'),
-            ),
-          ):Container(),
+         bubbleData.isGameOver? GameOverPopUp():Container(),
           
 
         ],

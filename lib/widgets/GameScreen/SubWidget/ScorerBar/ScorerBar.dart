@@ -79,7 +79,7 @@ class _ScorerBarState extends State<ScorerBar> with TickerProviderStateMixin{
     final provider = useProvider(jBubbleProvider);
     applyAnimation(provider);
     final size =MediaQuery.of(context).size;
-    BorderRadius  borderRadius= BorderRadius.circular(20.0);
+    BorderRadius  borderRadius= BorderRadius.circular(loadingBorderRadius);
     return Container(
       height: size.height*0.05,
       width: size.width,

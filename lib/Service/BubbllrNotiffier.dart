@@ -4,7 +4,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:bubble/Common/Commonvalue.dart';
+import 'package:bubble/Common/commmonTitle.dart';
 import 'package:bubble/Model/BubbleModel.dart';
+import '../Model/GameModelData/GameOverReason.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -13,9 +15,11 @@ class BubbleNotifier extends ChangeNotifier{
 //temporary Variable
 Color temporaryFalingColor =Colors.white;
 
-
+bool isLevelLoaded =false;
   ///level
+
   int currentLevel =1;
+
   int maxRaw = 25;
   List<List<BubbleModel>> bubbles = [];
   bool isInitialized = false;
@@ -32,7 +36,8 @@ Color temporaryFalingColor =Colors.white;
 //  Set<Offset> removeCoordinatedMain = Set();
 Set<Offset> mainRemoveNodes = Set();
 //moves
-  int moves = 10;
+  late int moves;
+  int levelMoves =10;
   // score
   int oldScorer=0;
   int currentScorer=0 ;
@@ -40,7 +45,6 @@ Set<Offset> mainRemoveNodes = Set();
   double oldScorerPercentage=0.0;
   int fixScorer =10000;
   int levelTargetScorer=0;
-
   int fixNextTarget =1000;// add 1000 in fixTargetScorer
   int fixedIncreasement=10;
   Set<Offset> mainFallingNode =Set();
@@ -48,6 +52,7 @@ Set<Offset> mainRemoveNodes = Set();
   bool isFallingAnimation =false;
 
   // gameOver
+  GameOverReasons gameOverReasons =GameOverReasons();
   bool isGameOver= false;
   bool isFinish =true;
   BubbleNotifier(){
@@ -57,7 +62,13 @@ Set<Offset> mainRemoveNodes = Set();
     //  notifyListeners();
     }
   }
-
+Future setLoadingAndInitializedFLag(bool val)async{
+  isInitialized =val;
+  isLevelLoaded =val;
+  gameOver('reason', false);
+  isFinish =false;
+  notifyListeners();
+}
   turnOffAnimation()async{
     this.isDisappearAnimation =false;
     this.isFallingAnimation =false;
@@ -67,6 +78,7 @@ Set<Offset> mainRemoveNodes = Set();
   //BubbleNotifier();
   void init(Size size)async{
     if(!isInitialized){
+      moves =levelMoves;
       bubbles.clear();
       for(int i =0;i<maxRaw;i++){
         int a = i % 2 == 0 ? 11 : 10;
@@ -88,6 +100,9 @@ Set<Offset> mainRemoveNodes = Set();
     //   screenBubble(size);
     // }
    await screenBubble(size,0.0,0.0);
+    isLevelLoaded =true;
+
+    notifyListeners();
   }
   Future removeFiredColorFromQueue() async{
 //   print(fireBubble);
@@ -95,10 +110,13 @@ Set<Offset> mainRemoveNodes = Set();
 
    if(fireBubble.length>0){
      fireBubble.remove(fireBubble.first);
-     moves = moves - 1;
-     if(moves==0){
-       isGameOver=true;
-       isFinish =true;
+    if(moves>=0){
+      moves = moves - 1;
+    }
+     if(moves<=1){
+
+
+        gameOver(outOfMoves, true);
      }
    }
 
@@ -155,9 +173,10 @@ Set<Offset> mainRemoveNodes = Set();
     }
 
   }
-  gameOver(){
+  gameOver(String reason,bool outofMoves){
     isGameOver=!isGameOver;
-    print('game Over');
+    gameOverReasons.isByMoves =outofMoves;
+    gameOverReasons.reason =reason;
     notifyListeners();
 
   }
@@ -193,7 +212,6 @@ Set<Offset> mainRemoveNodes = Set();
             }
             _bubbleColor =_bubbleColor.withOpacity(localOpacity);
                top = initialTop  + (ballWidth -2) * newTop;
-             //  top = initialTop  + (ballWidth -2) * iteration;
 
           }
           j.top =top;
@@ -206,7 +224,7 @@ Set<Offset> mainRemoveNodes = Set();
         iteration=iteration+1;
         if(iteration>=15){
           if(  isGameOver==false){
-            gameOver();
+            gameOver(gameOverText,false);
           }
 
         }

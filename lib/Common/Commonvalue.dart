@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+const double  loadingBorderRadius=20;
 //bubble size  size.height*0.9/21
 const Color BubbleColor0  = Colors.transparent ;
 const MaterialColor BubbleColor1  = Colors.red ;

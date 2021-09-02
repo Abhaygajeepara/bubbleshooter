@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         // primaryColor: themeColor,
         // backgroundColor: themeColor,
-        // scaffoldBackgroundColor:themeColor ,
+         scaffoldBackgroundColor:themeColor ,
         // primarySwatch: Colors.blue,
       ),
       home: FakeSlpash(),
@@ -62,9 +62,8 @@ class _FakeSlpashState extends State<FakeSlpash> {
   @override
   Widget build(BuildContext context) {
     final size =MediaQuery.of(context).size;
-    context.read(jBubbleProvider).assignColorToFiredBubbleColor();
-    context.read(jBubbleProvider).init(size);
-   return GameScreen();
+
+//   return GameScreen();
     return HomeScreen();
   }
 }

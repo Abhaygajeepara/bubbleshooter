@@ -3,6 +3,8 @@ import 'package:bubble/Model/BubbleModel.dart';
 import 'package:bubble/Service/Ads/AdService.dart';
 import 'package:bubble/Service/BubbllrNotiffier.dart';
 import 'package:bubble/main.dart';
+import 'package:bubble/widgets/GameScreen/SubWidget/GameScreen.dart';
+import 'package:bubble/widgets/GameScreen/SubWidget/LevelLoading/LevelLoading.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -14,7 +16,7 @@ class HomeScreen extends StatefulHookWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  AdsService adservice =AdsService();
+
   @override
   Widget build(BuildContext context) {
     final bubbleData = useProvider(jBubbleProvider);
@@ -23,21 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       //backgroundColor: Colors.white,
-      body: Column(
-       
-        children: [
-          ElevatedButton(
-            onPressed: ()async{
-            await  adservice.loadAd();
-              setState(() {
-                print('acac');
-              });
-            },
-            child: Text('Show add'),
-          ),
-          Expanded(child: adservice.bannerWidget)
-        ],
-      )
+      body: LevelLoading(size: size,bubbleNotifier: bubbleData,)
     );
   }
 }
